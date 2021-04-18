@@ -10,6 +10,8 @@ import edu.mta.repository.SemesterRepository;
 import edu.mta.utils.FrequentlyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.mta.repository.ClassRepository;
@@ -124,5 +126,14 @@ public class SemesterServiceImpl1 implements SemesterService {
 		}
 		return listSemester;
 	}
+
+	@Override
+    public Page<Semester> findAllSemester(Pageable pageable) {
+        Page<Semester> pageSemester = this.semesterRepository.findAll(pageable);
+        if (pageSemester == null || pageSemester.isEmpty()) {
+            return null;
+        }
+        return pageSemester;
+    }
 
 }

@@ -1,5 +1,7 @@
 package edu.mta.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,12 +90,12 @@ public class CourseServiceImpl1 implements CourseService {
 	}
 
 	@Override
-	public List<Course> findAllCourse() {
-		List<Course> listCourse = this.courseRepository.findAll();
-		if (listCourse == null || listCourse.isEmpty()) {
-			return null;
+	public Page<Course> findAllCourse(Pageable pageable) {
+		Page<Course> listCourse = this.courseRepository.findAll(pageable);
+		if (listCourse.hasContent()) {
+			return listCourse;
 		}
-		return listCourse;
+		return null;
 	}
 
 	@Override

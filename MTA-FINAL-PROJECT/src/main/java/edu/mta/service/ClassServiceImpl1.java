@@ -97,7 +97,13 @@ public class ClassServiceImpl1 implements ClassService {
 
 	@Override
 	public List<Class> getClassBySemesterName(String semesterName) {
-		List<Class> listClasses = this.classRepository.findBySemesterName(semesterName);
+		List<Class> listClasses;
+		if (semesterName != null && !semesterName.isEmpty()) {
+			listClasses = this.classRepository.findBySemesterName(semesterName);
+		} else {
+			listClasses = this.classRepository.findAll();
+		}
+
 		if (listClasses == null || listClasses.isEmpty()) {
 			return null;
 		}

@@ -1,9 +1,11 @@
 package edu.mta.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.mta.model.Course;
 import edu.mta.model.ReportError;
 import edu.mta.model.Semester;
 import edu.mta.service.SemesterService;
@@ -11,6 +13,9 @@ import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -145,12 +150,23 @@ public class SemesterController {
 	}
 	
 	@RequestMapping(value = "/semesters/all", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllSemester() {
-		List<Semester> listSemester = this.semesterService.findAllSemester();
-		if (listSemester == null) {
+	public ResponseEntity<?> getAllSemester(@RequestParam(required = false) Integer page,
+											@RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Semester> pageSemesters = this.semesterService.findAllSemester(pageRequest);
+		if (pageSemesters == null) {
 			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			if (pageSemesters != null) {
+				response.put("data", pageSemesters.getContent());
+				response.put("totalPages", pageSemesters.getTotalPages());
+				response.put("totalItems", pageSemesters.getTotalElements());
+				response.put("currentPage", pageSemesters.getNumber());
+				return ResponseEntity.ok(response);
+			}
 		}
-		return ResponseEntity.ok(listSemester);
+		return null;
 	}
 
 	@RequestMapping(value = "/semesters", method = RequestMethod.DELETE)

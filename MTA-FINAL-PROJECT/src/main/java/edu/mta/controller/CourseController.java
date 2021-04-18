@@ -10,6 +10,9 @@ import edu.mta.service.CourseService;
 import edu.mta.utils.ValidationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,21 +88,35 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/courses", method = RequestMethod.GET)
-	public ResponseEntity<?> getCourseInfo(@RequestParam(value = "courseID", required = true) int id) {
+	public ResponseEntity<?> getCourseInfo(@RequestParam(value = "courseID", required = false) Integer id,
+										   @RequestParam(required = false) Integer page) {
 		ReportError report = null;
-		String errorMessage = this.validationCourseData.validateIdData(id);
-		if (errorMessage != null) {
-			report = new ReportError(42, "Getting course failed because " + errorMessage);
-			return ResponseEntity.badRequest().body(report);
+		Course course = null;
+		Page<Course> pageCourses = null;
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, 10);
+
+		if (id != null) {
+			String errorMessage = this.validationCourseData.validateIdData(id);
+			if (errorMessage != null) {
+				report = new ReportError(42, "Getting course failed because " + errorMessage);
+				return ResponseEntity.badRequest().body(report);
+			}
+			course = this.courseService.getCourseInfo(id);
+			if (course != null) {
+				return ResponseEntity.ok(course);
+			}
+		} else {
+			pageCourses = this.courseService.findAllCourse(pageRequest);
+			Map<String, Object> response = new HashMap<>();
+			if (pageCourses != null) {
+				response.put("courses", pageCourses.getContent());
+				response.put("totalPages", pageCourses.getTotalPages());
+				response.put("totalCourses", pageCourses.getTotalElements());
+				response.put("currentPage", pageCourses.getNumber());
+				return ResponseEntity.ok(response);
+			}
 		}
-
-		Course course = this.courseService.getCourseInfo(id);
-
-		if (course != null) {
-			return ResponseEntity.ok(course);
-		}
-
-		report = new ReportError(43, "This course do not exist!");
+		report = new ReportError(43, "No courses found!");
 		return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
 	}
 
@@ -107,6 +124,7 @@ public class CourseController {
 	public ResponseEntity<?> updateCourseInfo(@RequestBody String courseInfo) {
 		String errorMessage = null;
 		ObjectMapper objectMapper = null;
+
 		Map<String, Object> jsonMap = null;
 		Course course = null;
 		ReportError report = null;
@@ -167,13 +185,24 @@ public class CourseController {
 		return ResponseEntity.badRequest().body(report);
 	}
 	
-	@RequestMapping(value = "/courses/all", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllCourse() {
-		List<Course> listCourse = this.courseService.findAllCourse();
-		if (listCourse == null) {
+	@RequestMapping(value = "/getAllCourses", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllCourse(@RequestParam(required = false) Integer page,
+										  @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Course> pageCourses = this.courseService.findAllCourse(pageRequest != null ? pageRequest : null);
+		if (pageCourses == null) {
 			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			if (pageCourses != null) {
+				response.put("data", pageCourses.getContent());
+				response.put("totalPages", pageCourses.getTotalPages());
+				response.put("totalItems", pageCourses.getTotalElements());
+				response.put("currentPage", pageCourses.getNumber());
+				return ResponseEntity.ok(response);
+			}
 		}
-		return ResponseEntity.ok(listCourse);
+		return null;
 	}
 
 	@RequestMapping(value = "/courses/getCoursesBySemeter", method = RequestMethod.GET)

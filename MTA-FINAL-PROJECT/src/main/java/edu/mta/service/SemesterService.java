@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import edu.mta.model.Semester;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SemesterService {
 	
@@ -24,4 +26,6 @@ public interface SemesterService {
 	void updateSemesterInfo(Semester semester);
 
 	List<Semester> findAllSemester();
+
+	Page<Semester> findAllSemester(Pageable pageable);
 }
