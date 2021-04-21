@@ -1,10 +1,7 @@
 package edu.mta.controller;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.enumData.AccountRole;
 import edu.mta.enumData.AccountStatus;
 import edu.mta.model.Account;
@@ -13,24 +10,20 @@ import edu.mta.model.User;
 import edu.mta.service.AccountService;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.GeneralValue;
+import edu.mta.utils.ValidationAccountData;
 import edu.mta.utils.ValidationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.utils.ValidationAccountData;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -148,9 +141,11 @@ public class AccountController {
 			
 			username = jsonMap.get("username").toString();
 			password = jsonMap.get("password").toString();
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			String encodedPassword = passwordEncoder.encode(password);
 			role = Integer.parseUnsignedInt(jsonMap.get("role").toString());
 
-			account = new Account(username, password, role, email);
+			account = new Account(username, encodedPassword, role, email);
 			account.setUserInfo(userInfo);
 			account.setIsActive(AccountStatus.ACTIVE.getValue());
 			account.setImei(null);
@@ -582,6 +577,10 @@ public class AccountController {
 				}
 
 				errorMessage = this.validationAccountData.validatePasswordData(tmpAccount.getPassword());
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				String encodedPassword = passwordEncoder.encode(tmpAccount.getPassword());
+				tmpAccount.setPassword(encodedPassword);
+
 				if (errorMessage != null) {
 					invalidAccount++;
 					infoOfRow += rowCounter +',';
