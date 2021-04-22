@@ -133,6 +133,7 @@ public class ValidationDataImpl1 implements ValidationData {
 					System.out.println("================ valid Year = " + validYear);
 					errorMessage = this.validationSemesterData.validateBeginDateData(beginDate, validYear);
 				}
+
 				if (errorMessage == null) {
 					errorMessage = this.validationSemesterData.validateEndDateData(endDate, beginDate, validYear);
 				}	

@@ -2,20 +2,23 @@
 package edu.mta.controller;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.mta.dto.ClassDTO;
+import edu.mta.dto.ClassRoomDTO;
+import edu.mta.model.*;
 import edu.mta.model.Class;
-import edu.mta.model.ClassRoom;
-import edu.mta.model.ReportError;
-import edu.mta.model.Room;
-import edu.mta.service.ClassRoomService;
-import edu.mta.service.ClassService;
-import edu.mta.service.RoomService;
+import edu.mta.service.*;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,8 +34,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.mta.service.StudentClassService;
-import edu.mta.service.TeacherClassService;
 import edu.mta.utils.ValidationClassRoomData;
 
 @CrossOrigin
@@ -47,6 +48,8 @@ public class ClassRoomController {
 	private ValidationData validationData;
 	private ValidationClassRoomData validationClassRoomData;
 	private FrequentlyUtils frequentlyUtils;
+
+	private SemesterService semesterService;
 
 	public ClassRoomController() {
 		super();
@@ -417,5 +420,76 @@ public class ClassRoomController {
 			report = new ReportError(2, "Error happened when jackson deserialization info!");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
 		}
+	}
+
+	@GetMapping("/getAllClassRoom")
+	public ResponseEntity<?> getAllClassRoom(@RequestParam(required = false) Integer page,
+											 @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<ClassRoom> pageClasses = this.classRoomService.getClassRoomBySemesterAndCourseAndClass(null, null, null, pageRequest);
+		if (pageClasses == null) {
+			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			List<ClassRoom> listClass = pageClasses.getContent();
+			List<ClassRoomDTO> listClassRoomDTO = new ArrayList<>();
+			for (ClassRoom classRoomToConvert: listClass) {
+				ClassRoomDTO classRoomDTO = new ClassRoomDTO();
+				classRoomDTO.setClassRoomId(classRoomToConvert.getId());
+				classRoomDTO.setSemesterName(classRoomToConvert.getClassInstance().getSemester().getSemesterName());
+				classRoomDTO.setCourseName(classRoomToConvert.getClassInstance().getCourse().getCourseName());
+				classRoomDTO.setClassName(classRoomToConvert.getClassInstance().getClassName());
+				classRoomDTO.setBeginAt(classRoomToConvert.getBeginAt());
+				classRoomDTO.setFinishAt(classRoomToConvert.getFinishAt());
+				classRoomDTO.setDayOfWeek(classRoomToConvert.getWeekday());
+				classRoomDTO.setRoomName(classRoomToConvert.getRoom().getRoomName());
+				listClassRoomDTO.add(classRoomDTO);
+			}
+			if (pageClasses != null) {
+				response.put("data", listClassRoomDTO);
+				response.put("totalPages", pageClasses.getTotalPages());
+				response.put("totalItems", pageClasses.getTotalElements());
+				response.put("currentPage", pageClasses.getNumber());
+				return ResponseEntity.ok(response);
+			}
+		}
+		return null;
+	}
+
+	@GetMapping("/getClassRoomByCourseAndClassAndRoom")
+	public ResponseEntity<?> getClassRoomByCourseAndClassAndRoom(@RequestParam(value = "courseId", required = false) Integer courseId,
+																	 @RequestParam(value = "classId", required = false) Integer classId,
+																	 @RequestParam(value = "roomId", required = false) Integer roomId,
+														             @RequestParam(required = false) Integer page,
+														             @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<ClassRoom> pageClasses = this.classRoomService.getClassRoomBySemesterAndCourseAndClass(courseId, classId, roomId, pageRequest);
+		if (pageClasses == null) {
+			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			List<ClassRoom> listClass = pageClasses.getContent();
+			List<ClassRoomDTO> listClassRoomDTO = new ArrayList<>();
+			for (ClassRoom classRoomToConvert: listClass) {
+				ClassRoomDTO classRoomDTO = new ClassRoomDTO();
+				classRoomDTO.setClassRoomId(classRoomToConvert.getId());
+				classRoomDTO.setSemesterName(classRoomToConvert.getClassInstance().getSemester().getSemesterName());
+				classRoomDTO.setCourseName(classRoomToConvert.getClassInstance().getCourse().getCourseName());
+				classRoomDTO.setClassName(classRoomToConvert.getClassInstance().getClassName());
+				classRoomDTO.setBeginAt(classRoomToConvert.getBeginAt());
+				classRoomDTO.setFinishAt(classRoomToConvert.getFinishAt());
+				classRoomDTO.setDayOfWeek(classRoomToConvert.getWeekday());
+				classRoomDTO.setRoomName(classRoomToConvert.getRoom().getRoomName());
+				listClassRoomDTO.add(classRoomDTO);
+			}
+			if (pageClasses != null) {
+				response.put("data", listClassRoomDTO);
+				response.put("totalPages", pageClasses.getTotalPages());
+				response.put("totalItems", pageClasses.getTotalElements());
+				response.put("currentPage", pageClasses.getNumber());
+				return ResponseEntity.ok(response);
+			}
+		}
+		return null;
 	}
 }

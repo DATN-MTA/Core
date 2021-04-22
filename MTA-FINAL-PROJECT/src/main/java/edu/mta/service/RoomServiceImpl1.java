@@ -7,6 +7,8 @@ import java.util.Optional;
 import edu.mta.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.mta.model.Room;
@@ -129,13 +131,22 @@ public class RoomServiceImpl1 implements RoomService {
 	}
 
 	@Override
-	public List<Room> findAllSemester() {
+	public List<Room> findAllRooms() {
 		List<Room> listRoom = this.roomRepository.findAll();
 		if (listRoom == null || listRoom.isEmpty()) {
 			return null;
 		}
 		
 		System.out.println("================list room size = " + listRoom.size());
+		return listRoom;
+	}
+
+	@Override
+	public Page<Room> findAllRooms(Pageable pageable) {
+		Page<Room> listRoom = this.roomRepository.findAll(pageable);
+		if (listRoom == null || listRoom.isEmpty()) {
+			return null;
+		}
 		return listRoom;
 	}
 

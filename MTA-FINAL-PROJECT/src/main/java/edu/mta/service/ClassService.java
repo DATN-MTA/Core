@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import edu.mta.model.Class;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ClassService {
 
@@ -22,5 +24,9 @@ public interface ClassService {
 	List<Class> getListClassByCourseID(int courseID);
 
 	List<Class> getClassBySemesterName(String semesterName);
+
+	Page<Class> getAllClasses(Pageable pageable);
+
+	Page<Class> getClassesBySemesterAndCourse(Pageable pageable, Integer semesterId, Integer courseId);
 
 }

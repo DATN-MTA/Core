@@ -5,8 +5,11 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import edu.mta.model.Class;
 import edu.mta.model.ClassRoom;
 import edu.mta.model.Room;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,5 +45,14 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoom, Integer> {
 	
 	@Query("SELECT cr FROM ClassRoom cr WHERE cr.room.id = ?1")
 	List<ClassRoom> findAllByRoomID(int roomID);
+
+	@Query("SELECT cr FROM ClassRoom cr WHERE cr.room.id = ?1")
+	Page<ClassRoom> findAllByRoomID(Integer roomID, Pageable pageable);
+
+	@Query("SELECT cr FROM ClassRoom cr WHERE cr.classInstance.id = ?1")
+	Page<ClassRoom> findByClassID(Integer classId, Pageable pageable);
+
+	@Query("SELECT cr FROM ClassRoom cr WHERE cr.classInstance.id IN :ids")
+	Page<ClassRoom> getListClassRoom(@Param("ids") List<Integer> listClassID, Pageable pageable);
 
 }

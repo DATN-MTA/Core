@@ -15,6 +15,8 @@ import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationClassData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.mta.repository.ClassRepository;
@@ -279,6 +281,24 @@ public class ClassRoomServiceImpl1 implements ClassRoomService {
 		this.classRoomRepository.save(classRoom);
 		return true;
 		
+	}
+
+	@Override
+	public Page<ClassRoom> getClassRoomBySemesterAndCourseAndClass(Integer courseId, Integer classId, Integer roomId, Pageable pageable) {
+		if (courseId != null && classId == null) {
+			List<Integer> listClassId = this.classRepository.findListClassIdByCourseID(courseId);
+			if (listClassId.size() > 0) {
+				return this.classRoomRepository.getListClassRoom(listClassId, pageable);
+			} else {
+				return null;
+			}
+		} else if (classId != null) {
+			return this.classRoomRepository.findByClassID(classId, pageable);
+		} else if (roomId != null) {
+			return this.classRoomRepository.findAllByRoomID(roomId, pageable);
+		} else {
+			return this.classRoomRepository.findAll(pageable);
+		}
 	}
 
 }

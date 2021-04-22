@@ -6,8 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.mta.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -132,12 +136,24 @@ public class RoomController {
 	}
 	
 	@RequestMapping(value = "/rooms/all", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllRooms() {
-		List<Room> listRooms = this.roomService.findAllSemester();
-		if (listRooms == null) {
+	public ResponseEntity<?> getAllRooms(@RequestParam(required = false) Integer page,
+										 @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Room> pageRooms = this.roomService.findAllRooms(pageRequest != null ? pageRequest : null);
+
+		if (pageRooms == null) {
 			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			if (pageRooms != null) {
+				response.put("data", pageRooms.getContent());
+				response.put("totalPages", pageRooms.getTotalPages());
+				response.put("totalItems", pageRooms.getTotalElements());
+				response.put("currentPage", pageRooms.getNumber());
+				return ResponseEntity.ok(response);
+			}
 		}
-		return ResponseEntity.ok(listRooms);
+		return null;
 	}
 
 	@RequestMapping(value = "/rooms", method = RequestMethod.PUT)

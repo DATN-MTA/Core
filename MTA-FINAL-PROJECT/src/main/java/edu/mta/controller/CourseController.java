@@ -88,12 +88,9 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/courses", method = RequestMethod.GET)
-	public ResponseEntity<?> getCourseInfo(@RequestParam(value = "courseID", required = false) Integer id,
-										   @RequestParam(required = false) Integer page) {
+	public ResponseEntity<?> getCourseInfo(@RequestParam(value = "courseID", required = true) Integer id) {
 		ReportError report = null;
 		Course course = null;
-		Page<Course> pageCourses = null;
-		Pageable pageRequest = PageRequest.of(page != null ? page : 0, 10);
 
 		if (id != null) {
 			String errorMessage = this.validationCourseData.validateIdData(id);
@@ -104,16 +101,6 @@ public class CourseController {
 			course = this.courseService.getCourseInfo(id);
 			if (course != null) {
 				return ResponseEntity.ok(course);
-			}
-		} else {
-			pageCourses = this.courseService.findAllCourse(pageRequest);
-			Map<String, Object> response = new HashMap<>();
-			if (pageCourses != null) {
-				response.put("courses", pageCourses.getContent());
-				response.put("totalPages", pageCourses.getTotalPages());
-				response.put("totalCourses", pageCourses.getTotalElements());
-				response.put("currentPage", pageCourses.getNumber());
-				return ResponseEntity.ok(response);
 			}
 		}
 		report = new ReportError(43, "No courses found!");
