@@ -1,21 +1,16 @@
 package edu.mta.service;
 
+import edu.mta.enumData.IsLearning;
+import edu.mta.enumData.IsTeaching;
+import edu.mta.external.StudentClassDAL;
+import edu.mta.model.*;
+import edu.mta.utils.GeneralValue;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-
-import edu.mta.model.DetailRecordForClass;
-import org.springframework.stereotype.Service;
-
-import edu.mta.enumData.IsLearning;
-import edu.mta.enumData.IsTeaching;
-import edu.mta.external.StudentClassDAL;
-import edu.mta.model.GeneralStudentRecord;
-import edu.mta.model.GeneralTeacherRecord;
-import edu.mta.model.StudentClass;
-import edu.mta.model.TeacherClass;
-import edu.mta.utils.GeneralValue;
 
 @Service
 public class ReportServiceImpl1 {
@@ -379,7 +374,7 @@ public class ReportServiceImpl1 {
 			
 			if (listRollCallRaw == null || listRollCallRaw.isBlank()) {
 				record = new DetailRecordForClass();
-				studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0];
+				//need_change studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0]
 				record.setStudentName(studentName);
 				record.setSumOfMissingRollCall(0);
 				record.setSumOfRollCall(0);
@@ -459,9 +454,9 @@ public class ReportServiceImpl1 {
 				}
 					
 			}
-			
-			System.out.println("\n\n user info = " + studentClass.getAccount().getUserInfo());
-			studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0];
+
+			//need_changeSystem.out.println("\n\n user info = " + studentClass.getAccount().getUserInfo());
+			//need_change studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0];
 			System.out.println("\n\n studentName = " + studentName);
 			
 			record = new DetailRecordForClass();

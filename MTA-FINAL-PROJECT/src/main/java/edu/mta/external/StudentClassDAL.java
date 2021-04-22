@@ -1,19 +1,15 @@
 package edu.mta.external;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.mta.enumData.IsLearning;
 import edu.mta.model.Account;
 import edu.mta.model.Course;
 import edu.mta.model.StudentClass;
 import edu.mta.model.TeacherClass;
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StudentClassDAL {
@@ -160,8 +156,8 @@ public class StudentClassDAL {
 			while (rs.next()) {
 				studentClass = new StudentClass();
 				tmpAccount = new Account();
-				
-				tmpAccount.setUserInfo(rs.getString("UserInfo"));
+
+				//need_change tmpAccount.setUserInfo(rs.getString("UserInfo"));
 				tmpAccount.setEmail(rs.getString("Email"));
 				studentClass.setAccount(tmpAccount);
 				studentClass.setListRollCall(rs.getString("listRollCall"));

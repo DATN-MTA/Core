@@ -1,42 +1,28 @@
 package edu.mta.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.enumData.IsTeaching;
+import edu.mta.model.Class;
+import edu.mta.model.*;
+import edu.mta.service.*;
+import edu.mta.utils.FrequentlyUtils;
+import edu.mta.utils.ValidationAccountData;
+import edu.mta.utils.ValidationRoomData;
+import edu.mta.utils.ValidationTeacherClassData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import edu.mta.enumData.AccountRole;
-import edu.mta.enumData.IsTeaching;
-import edu.mta.model.Account;
-import edu.mta.model.Class;
-import edu.mta.model.ReportError;
-import edu.mta.model.TeacherClass;
-import edu.mta.service.AccountService;
-import edu.mta.service.ClassService;
-import edu.mta.service.RoomService;
-import edu.mta.utils.FrequentlyUtils;
-import edu.mta.utils.ValidationRoomData;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.service.StudentClassService;
-import edu.mta.service.TeacherClassService;
-import edu.mta.utils.ValidationAccountData;
-import edu.mta.utils.ValidationTeacherClassData;
 
 @CrossOrigin
 @RestController
@@ -328,7 +314,7 @@ public class TeacherClassController {
 
 			// check if the student and the class exist
 			teacherAccount = this.accountService.findAccountByEmail(teacherEmail);
-			if (teacherAccount == null || teacherAccount.getRole() != AccountRole.TEACHER.getValue()) {
+			if (teacherAccount == null || !teacherAccount.getRoles().contains(Role.ROLE_TEACHER)) {
 				report = new ReportError(110, "Adding teacher to class failed because teacher email is invalid ");
 				return ResponseEntity.badRequest().body(report);
 			}

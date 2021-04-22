@@ -1,21 +1,37 @@
 package edu.mta.service;
 
-import java.util.Optional;
-
 import edu.mta.enumData.AccountStatus;
+import edu.mta.exception.CustomException;
 import edu.mta.model.Account;
 import edu.mta.model.User;
 import edu.mta.repository.AccountRepository;
+import edu.mta.security.jwt.JwtTokenProvider;
 import edu.mta.utils.GeneralValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Qualifier("AccountServiceImpl1")
 public class AccountServiceImpl1 implements AccountService {
 
 	private AccountRepository accountRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
 	@Autowired
 	public AccountServiceImpl1(AccountRepository accountRepository) {
@@ -91,7 +107,7 @@ public class AccountServiceImpl1 implements AccountService {
 		String userInfo = createUserInfoString(user);
 
 		Account account = this.accountRepository.findById(user.getId()).get();
-		account.setUserInfo(userInfo);
+		//need_change account.setUserInfo(userInfo);
 		this.accountRepository.save(account);
 		return;
 	}
@@ -116,7 +132,7 @@ public class AccountServiceImpl1 implements AccountService {
 
 		Account account = oldInfo.get();
 		String userInfo = createUserInfoString(user);
-		account.setUserInfo(userInfo);
+		//need_change account.setUserInfo(userInfo);
 		this.accountRepository.save(account);
 		return true;
 	}
@@ -132,6 +148,25 @@ public class AccountServiceImpl1 implements AccountService {
 		userInfo += user.getBirthDay();
 		
 		return userInfo;
+	}
+
+	public String signin(String username, String password) {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			return jwtTokenProvider.createToken(username, accountRepository.getUserByUsername(username).getRoles());
+		} catch (AuthenticationException e) {
+			throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+
+	public String signup(Account account) {
+		if (!accountRepository.existsByUsername(account.getUsername())) {
+			account.setPassword(passwordEncoder.encode(account.getPassword()));
+			accountRepository.save(account);
+			return jwtTokenProvider.createToken(account.getUsername(), account.getRoles());
+		} else {
+			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
 	}
 
 	@Override

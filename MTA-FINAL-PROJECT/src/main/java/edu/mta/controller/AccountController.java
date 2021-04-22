@@ -2,20 +2,25 @@ package edu.mta.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mta.enumData.AccountRole;
+import edu.mta.dto.AccountDataDTO;
 import edu.mta.enumData.AccountStatus;
 import edu.mta.model.Account;
 import edu.mta.model.ReportError;
 import edu.mta.model.User;
 import edu.mta.service.AccountService;
 import edu.mta.utils.FrequentlyUtils;
-import edu.mta.utils.GeneralValue;
 import edu.mta.utils.ValidationAccountData;
 import edu.mta.utils.ValidationData;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,6 +40,10 @@ public class AccountController {
 	private FrequentlyUtils frequentlyUtils;
 
 	@Autowired
+	private ModelMapper modelMapper;
+
+
+	@Autowired
 	public AccountController(@Qualifier("AccountServiceImpl1") AccountService accountService,
 			@Qualifier("ValidationDataImpl1") ValidationData validationData,
 			@Qualifier("FrequentlyUtilsImpl1") FrequentlyUtils frequentlyUtils,
@@ -45,7 +54,28 @@ public class AccountController {
 		this.validationAccountData = validationAccountData;
 	}
 
+	@PostMapping("/signin")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 422, message = "Invalid username/password supplied")})
+	public String login(//
+						@ApiParam("Username") @RequestParam String username, //
+						@ApiParam("Password") @RequestParam String password) {
+		return accountService.signin(username, password);
+	}
+
+	@PostMapping("/signup")
+	@ApiOperation(value = "${UserController.signup}")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 422, message = "Username is already in use")})
+	public String signup(@ApiParam("Signup User") @RequestBody AccountDataDTO accountDataDTO) {
+		return accountService.signup(modelMapper.map(accountDataDTO, Account.class));
+	}
+
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<?> checkLogin(@RequestBody String infoLogin) {
 		Map<String, Object> jsonMap = null;
 		ObjectMapper objectMapper = null;
@@ -87,11 +117,9 @@ public class AccountController {
 			}
 
 			// in the first login, student will be redirect to Update info page
-			if (account.getRole() == AccountRole.STUDENT.getValue()) {
-				if (account.getImei() == null || account.getImei().isBlank()) {
-					account.setImei(null);
-				}
-			}
+			//need_change if (account.getImei() == null || account.getImei().isBlank()) {
+			//need_change account.setImei(null);
+			//need_change 	}
 
 			return ResponseEntity.ok(account);
 
@@ -146,10 +174,10 @@ public class AccountController {
 			role = Integer.parseUnsignedInt(jsonMap.get("role").toString());
 
 			account = new Account(username, encodedPassword, role, email);
-			account.setUserInfo(userInfo);
+			//need_change account.setUserInfo(userInfo);
 			account.setIsActive(AccountStatus.ACTIVE.getValue());
-			account.setImei(null);
-			account.setUpdateImeiCounter(0);
+			//need_change account.setImei(null);
+			//need_change account.setUpdateImeiCounter(0);
 			this.accountService.saveAccount(account);
 
 			return new ResponseEntity<>("Registration success", HttpStatus.CREATED);
@@ -351,7 +379,8 @@ public class AccountController {
 			}
 
 			newImei = jsonMap.get("imei").toString();
-			if (!newImei.equals(account.getImei()) || account.getRole() == AccountRole.STUDENT.getValue()) {
+			/* //need_change
+			if (!newImei.equals(account.getImei()) || account.getRoles().contains(Role.ROLE_STUDENT)) {
 				if (account.getUpdateImeiCounter() == GeneralValue.maxTimesForUpdatingImei) {
 					report = new ReportError(18, "This account is not allowed to change IMEI number anymore");
 					return ResponseEntity.badRequest().body(report);
@@ -359,7 +388,7 @@ public class AccountController {
 
 				account.setImei(newImei);
 				account.setUpdateImeiCounter(account.getUpdateImeiCounter() + 1);
-			}
+			} */
 
 			if (updateUser == true) {
 				LocalDate birthday = null;
@@ -377,10 +406,10 @@ public class AccountController {
 				phone = jsonMap.get("phone").toString();
 				birthday = LocalDate.parse(jsonMap.get("birthday").toString());
 				address = jsonMap.get("address").toString();
-				user = new User(address, fullName, birthday, phone);
+//				user = new User(address, fullName, birthday, phone);
 
 				String userInfo = this.accountService.createUserInfoString(user);
-				account.setUserInfo(userInfo);
+				//need_change account.setUserInfo(userInfo);
 			}
 
 			account.setEmail(newEmail);
@@ -435,18 +464,17 @@ public class AccountController {
 				report = new ReportError(11, "Authentication has failed or has not yet been provided!");
 				return new ResponseEntity<>(report, HttpStatus.UNAUTHORIZED);
 			}
-
+            /* //need_change
 			String tmpUserInfo = account.getUserInfo();
 			if (tmpUserInfo != null && !tmpUserInfo.isEmpty()) {
 				report = new ReportError(21, "User's info cannot be overriden by this API !");
 				return new ResponseEntity<>(report, HttpStatus.CONFLICT);
-			}
-
+			} */
 			fullName = jsonMap.get("fullName").toString();
 			phone = jsonMap.get("phone").toString();
 			birthday = LocalDate.parse(jsonMap.get("birthday").toString());
 			address = jsonMap.get("address").toString();
-			user = new User(id, address, fullName, birthday, phone);
+//			user = new User(id, address, fullName, birthday, phone);
 
 			this.accountService.addUserInfo(user);
 			report = new ReportError(200, "Add user info successful!");
@@ -501,7 +529,7 @@ public class AccountController {
 			phone = jsonMap.get("phone").toString();
 			birthday = LocalDate.parse(jsonMap.get("birthday").toString());
 			address = jsonMap.get("address").toString();
-			user = new User(id, address, fullName, birthday, phone);
+//			user = new User(id, address, fullName, birthday, phone);
 
 			this.accountService.updateUserInfo(user);
 			report = new ReportError(200, "Update user info successful!");
@@ -535,14 +563,16 @@ public class AccountController {
 
 			Account account = this.accountService.findAccountByEmailAndPassword(email, password);
 			if (account != null) {
+				/* //need_change
 				String userInfo = account.getUserInfo();
 				if (userInfo == null || userInfo.isBlank()) {
 					report = new ReportError(23, "This user info has not existed yet!");
 					return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
-				}
+				} */
 			}
 
-			return ResponseEntity.ok(account.getUserInfo());
+			//need_change return ResponseEntity.ok(account.getUserInfo());
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			report = new ReportError(2, "Error happened when jackson deserialization info!");

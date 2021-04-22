@@ -2,14 +2,10 @@ package edu.mta.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -19,32 +15,27 @@ public class Account implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", length = 1)
 	private int id;
 
-	@Column(name = "Username", nullable = false, length = 20)
+	@Size(min = 4, max = 255, message = "Minimum username length: 4 characters")
+	@Column(unique = true, nullable = false)
 	private String username;
 
-	@Column(name = "Password", nullable = false, length = 20)
+	@Size(min = 8, message = "Minimum password length: 8 characters")
 	private String password;
 
-	@Column(name = "Role", nullable = false, length = 1)
-	private int role;
+	@ElementCollection(fetch = FetchType.EAGER)
+	List<Role> roles;
 
 	@Column(name = "IsActive", nullable = false, length = 1)
 	private int isActive;
 
-	@Column(name = "Email", nullable = false, length = 30, unique = true)
+	@Column(unique = true, nullable = false)
 	private String email;
 
-	@Column(name = "IMEI", nullable = true, length = 20)
-	private String imei;
-	
-	@Column(name = "UpdateImeiCounter", length = 1)
-	private int updateImeiCounter;
-	
-	@Column(name = "UserInfo", length = 200)
-	private String userInfo;
+	@OneToOne(mappedBy = "account")
+	private User user;
+
 
 	public Account(String password, String email) {
 		super();
@@ -56,16 +47,15 @@ public class Account implements Serializable {
 		super();
 		this.username = username;
 		this.password = password;
-		this.role = role;
 		this.email = email;
 	}
 
-	public Account(String username, String password, String email, String imei) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.imei = imei;
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Account() {
@@ -97,12 +87,12 @@ public class Account implements Serializable {
 		this.password = password;
 	}
 
-	public int getRole() {
-		return role;
+	public List<Role> getRoles() {
+		return roles;
 	}
 
-	public void setRole(int role) {
-		this.role = role;
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
 	}
 
 	public int getIsActive() {
@@ -119,30 +109,6 @@ public class Account implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getImei() {
-		return imei;
-	}
-
-	public void setImei(String imei) {
-		this.imei = imei;
-	}
-
-	public String getUserInfo() {
-		return userInfo;
-	}
-
-	public void setUserInfo(String userInfo) {
-		this.userInfo = userInfo;
-	}
-
-	public int getUpdateImeiCounter() {
-		return updateImeiCounter;
-	}
-
-	public void setUpdateImeiCounter(int updateImeiCounter) {
-		this.updateImeiCounter = updateImeiCounter;
 	}
 
 	@Override

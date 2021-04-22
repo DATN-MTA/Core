@@ -43,4 +43,8 @@ public interface AccountService {
 	Account findAccountByEmail(String email);
 
 	String createUserInfoString(User user);
+
+	String signin(String username, String password);
+
+	String signup(Account account);
 }

@@ -1,45 +1,23 @@
 package edu.mta.controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import edu.mta.enumData.AccountRole;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.model.Class;
+import edu.mta.model.*;
+import edu.mta.service.*;
+import edu.mta.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.model.Account;
-import edu.mta.model.GeneralStudentRecord;
-import edu.mta.model.GeneralTeacherRecord;
-import edu.mta.model.ReportError;
-import edu.mta.model.ReportOutput;
-import edu.mta.model.Semester;
-import edu.mta.model.DetailRecordForClass;
-import edu.mta.service.AccountService;
-import edu.mta.service.BaseService;
-import edu.mta.service.BirtRuner;
-import edu.mta.service.ClassService;
-import edu.mta.service.ReportServiceImpl1;
-import edu.mta.service.SemesterService;
-import edu.mta.utils.GeneralValue;
-import edu.mta.utils.FrequentlyUtils;
-import edu.mta.utils.ValidationAccountData;
-import edu.mta.utils.ValidationClassData;
-import edu.mta.utils.ValidationSemesterData;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -84,6 +62,7 @@ public class ReportController {
 	}
 
 	@RequestMapping(value = "/teacherGeneralReport", method = RequestMethod.POST)
+	@PreAuthorize("hasRoles('ROLE_ADMIN', 'ROLE_TEACHER')")
 	public ResponseEntity<?> getTeacherGeneralReport(@RequestParam(value = "adminID", required = true) int adminID,
 			@RequestBody String reportParams) {
 		ReportOutput output = new ReportOutput();
@@ -111,11 +90,11 @@ public class ReportController {
 
 			System.out.println("\n\nMile 1");
 			Account tmpAccount = this.accountService.findAccountByID(adminID);
-			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
-					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
-				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
-				return ResponseEntity.badRequest().body(report);
-			}
+//			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
+//					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
+//				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
+//				return ResponseEntity.badRequest().body(report);
+//			}
 
 			System.out.println("\n\nMile 2");
 			String teacherEmail = jsonMap.get("email").toString();
@@ -127,17 +106,17 @@ public class ReportController {
 
 			System.out.println("\n\nMile 3");
 			Account account = this.accountService.findAccountByEmail(teacherEmail);
-			if (account == null || account.getRole() != AccountRole.TEACHER.getValue()) {
+			if (account == null || !account.getRoles().contains(Role.ROLE_TEACHER)) {
 				report = new ReportError(112, "This email address is not valid!");
 				return ResponseEntity.badRequest().body(report);
 			}
 
 			System.out.println("\n\nMile 4");
-			System.out.println("\n\n user info = " + account.getUserInfo());
-			String[] teacherInfo = account.getUserInfo().split(GeneralValue.regexForSplitUserInfo);
-			System.out.println("\n\n full name = " + teacherInfo[0]);
+			//need_change System.out.println("\n\n user info = " + account.getUserInfo());
+			//need_change String[] teacherInfo = account.getUserInfo().split(GeneralValue.regexForSplitUserInfo);
+			//need_change System.out.println("\n\n full name = " + teacherInfo[0]);
 
-			jsonMap.put("teacherName", teacherInfo[0]);
+			//need_change jsonMap.put("teacherName", teacherInfo[0]);
 
 			System.out.println("\n\nMile 5");
 			int semesterID = Integer.parseInt(jsonMap.get("semesterID").toString());
@@ -209,6 +188,7 @@ public class ReportController {
 	}
 	
 	@RequestMapping(value = "/studentGeneralReport", method = RequestMethod.POST)
+	@PreAuthorize("hasRoles('ROLE_ADMIN', 'ROLE_TEACHER')")
 	public ResponseEntity<?> getStudentGeneralReport(@RequestParam(value = "adminID", required = true) int adminID,
 			@RequestBody String reportParams) {
 		ReportOutput output = new ReportOutput();
@@ -236,11 +216,11 @@ public class ReportController {
 
 			System.out.println("\n\nMile 1");
 			Account tmpAccount = this.accountService.findAccountByID(adminID);
-			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
-					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
-				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
-				return ResponseEntity.badRequest().body(report);
-			}
+//			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
+//					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
+//				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
+//				return ResponseEntity.badRequest().body(report);
+//			}
 
 			System.out.println("\n\nMile 2");
 			String studentEmail = jsonMap.get("email").toString();
@@ -252,17 +232,17 @@ public class ReportController {
 
 			System.out.println("\n\nMile 3");
 			Account account = this.accountService.findAccountByEmail(studentEmail);
-			if (account == null || account.getRole() != AccountRole.STUDENT.getValue()) {
+			if (account == null || !account.getRoles().contains(Role.ROLE_STUDENT)) {
 				report = new ReportError(112, "This email address is not valid!");
 				return ResponseEntity.badRequest().body(report);
 			}
 
 			System.out.println("\n\nMile 4");
-			System.out.println("\n\n user info = " + account.getUserInfo());
-			String[] studentInfo = account.getUserInfo().split(GeneralValue.regexForSplitUserInfo);
-			System.out.println("\n\n full name = " + studentInfo[0]);
+			//need_changeSystem.out.println("\n\n user info = " + account.getUserInfo());
+			//need_change String[] studentInfo = account.getUserInfo().split(GeneralValue.regexForSplitUserInfo);
+			//need_change System.out.println("\n\n full name = " + studentInfo[0]);
 
-			jsonMap.put("studentName", studentInfo[0]);
+			//need_change jsonMap.put("studentName", studentInfo[0]);
 
 			System.out.println("\n\nMile 5");
 			int semesterID = Integer.parseInt(jsonMap.get("semesterID").toString());
@@ -332,6 +312,7 @@ public class ReportController {
 	}
 	
 	@RequestMapping(value = "/classDetailReport", method = RequestMethod.POST)
+	@PreAuthorize("hasRoles('ROLE_ADMIN', 'ROLE_TEACHER')")
 	public ResponseEntity<?> getClassDetailReport(@RequestParam(value = "adminID", required = true) int adminID,
 			@RequestBody String reportParams) {
 		
@@ -360,11 +341,11 @@ public class ReportController {
 
 			System.out.println("\n\nMile 1");
 			Account tmpAccount = this.accountService.findAccountByID(adminID);
-			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
-					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
-				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
-				return ResponseEntity.badRequest().body(report);
-			}
+//			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
+//					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
+//				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
+//				return ResponseEntity.badRequest().body(report);
+//			}
 			
 			int classID = Integer.parseInt(jsonMap.get("classID").toString());
 			errorMessage = this.validationClassData.validateIdData(classID);

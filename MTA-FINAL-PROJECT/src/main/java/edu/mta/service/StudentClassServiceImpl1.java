@@ -1,28 +1,24 @@
 package edu.mta.service;
 
+import edu.mta.enumData.IsLearning;
+import edu.mta.enumData.SpecialRollCall;
+import edu.mta.model.Class;
+import edu.mta.model.*;
+import edu.mta.repository.ClassRoomRepository;
+import edu.mta.repository.StudentClassRepository;
+import edu.mta.utils.FrequentlyUtils;
+import edu.mta.utils.GeneralValue;
+import edu.mta.utils.ValidationAccountData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import edu.mta.enumData.IsLearning;
-import edu.mta.enumData.SpecialRollCall;
-import edu.mta.model.Class;
-import edu.mta.repository.StudentClassRepository;
-import edu.mta.utils.FrequentlyUtils;
-import edu.mta.utils.GeneralValue;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import edu.mta.model.Account;
-import edu.mta.model.ClassRoom;
-import edu.mta.model.ReportError;
-import edu.mta.model.StudentClass;
-import edu.mta.repository.ClassRoomRepository;
-import edu.mta.utils.ValidationAccountData;
 
 @Service
 @Qualifier("StudentClassServiceImpl1")
@@ -136,13 +132,13 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		instance = studentClass.get();
 		listRollCall = instance.getListRollCall();
 		// create a blacklist's record if imei is different
-		if (!instance.getAccount().getImei().equals(imei)) {
+		//need_change if (!instance.getAccount().getImei().equals(imei)) {
 			// this.blacklistService.createNewRecord(instance, imei);
 			// return "Warning: System has created a record in blacklist for your incorrect
 			// IMEI!";
 
-			return "Sorry! It seem like you are using other's device!";
-		}
+		//need_change return "Sorry! It seem like you are using other's device!";
+		//need_change }
 
 		newValue = this.frequentlyUtils.makeRollcallRecord(rollCallAt) + GeneralValue.regexForSplitListRollCall;
 
