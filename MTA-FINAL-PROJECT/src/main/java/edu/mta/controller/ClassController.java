@@ -1,9 +1,12 @@
 package edu.mta.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.mta.dto.ClassDTO;
 import edu.mta.model.Class;
 import edu.mta.model.Course;
 import edu.mta.model.ReportError;
@@ -17,6 +20,9 @@ import edu.mta.utils.ValidationCourseData;
 import edu.mta.utils.ValidationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -291,7 +297,7 @@ public class ClassController {
 		}
 
 		Class classInstance = this.classService.findClassByClassName(className);
-		if (classInstance != null) {
+		if (classInstance == null) {
 			report = new ReportError(63, "This class do not exist!");
 			return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
 		}
@@ -321,12 +327,70 @@ public class ClassController {
 	}
 
 	@GetMapping("/getAllClasses")
-	public ResponseEntity<?> getAllClasses(@RequestParam(value = "semester", required = false) String semesterName) {
-		List<Class> listClasses = this.classService.getClassBySemesterName(semesterName);
-		if (listClasses != null && !listClasses.isEmpty()) {
-			return ResponseEntity.ok(listClasses);
-		} else {
+	public ResponseEntity<?> getAllClasses(@RequestParam(required = false) Integer page,
+										   @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Class> pageClasses = this.classService.getAllClasses(pageRequest != null ? pageRequest : null);
+		if (pageClasses == null) {
 			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			List<Class> listClass = pageClasses.getContent();
+			List<ClassDTO> listClassDTO = new ArrayList<>();
+			for (Class classToConvert: listClass) {
+				ClassDTO classDTO = new ClassDTO();
+				classDTO.setClassId(classToConvert.getId());
+				classDTO.setSemester(classToConvert.getSemester().getSemesterName());
+				classDTO.setCourse(classToConvert.getCourse().getCourseName());
+				classDTO.setNumberOfLession(classToConvert.getNumberOfLessons());
+				classDTO.setNumberOfStudents(classToConvert.getMaxStudent());
+				classDTO.setClassName(classToConvert.getClassName());
+				classDTO.setCurrentLession(classToConvert.getCurrentLesson());
+				listClassDTO.add(classDTO);
+			}
+			if (pageClasses != null) {
+				response.put("data", listClassDTO);
+				response.put("totalPages", pageClasses.getTotalPages());
+				response.put("totalItems", pageClasses.getTotalElements());
+				response.put("currentPage", pageClasses.getNumber());
+				return ResponseEntity.ok(response);
+			}
 		}
+		return null;
+	}
+
+	@GetMapping("/getClassesBySemesterAndCourse")
+	public ResponseEntity<?> getClassesBySemesterAndCourse(@RequestParam(value = "semesterId", required = false) Integer semesterId,
+														   @RequestParam(value = "courseId", required = false) Integer courseId,
+														   @RequestParam(required = false) Integer page,
+										                   @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Class> pageClasses = this.classService.getClassesBySemesterAndCourse(pageRequest, semesterId, courseId);
+		if (pageClasses == null) {
+			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			List<Class> listClass = pageClasses.getContent();
+			List<ClassDTO> listClassDTO = new ArrayList<>();
+			for (Class classToConvert: listClass) {
+				ClassDTO classDTO = new ClassDTO();
+				classDTO.setClassId(classToConvert.getId());
+				classDTO.setSemester(classToConvert.getSemester().getSemesterName());
+				classDTO.setCourse(classToConvert.getCourse().getCourseName());
+				classDTO.setNumberOfLession(classToConvert.getNumberOfLessons());
+				classDTO.setNumberOfStudents(classToConvert.getMaxStudent());
+				classDTO.setClassName(classToConvert.getClassName());
+				classDTO.setCurrentLession(classToConvert.getCurrentLesson());
+				listClassDTO.add(classDTO);
+			}
+			if (pageClasses != null) {
+				response.put("data", listClassDTO);
+				response.put("totalPages", pageClasses.getTotalPages());
+				response.put("totalItems", pageClasses.getTotalElements());
+				response.put("currentPage", pageClasses.getNumber());
+				return ResponseEntity.ok(response);
+			}
+		}
+		return null;
 	}
 }

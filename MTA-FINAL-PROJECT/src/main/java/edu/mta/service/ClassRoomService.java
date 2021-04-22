@@ -5,6 +5,8 @@ import java.util.List;
 
 import edu.mta.model.ClassRoom;
 import edu.mta.model.Room;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ClassRoomService {
 
@@ -35,5 +37,8 @@ public interface ClassRoomService {
 	List<ClassRoom> checkListClassRoom(List<ClassRoom> listClassRoom, int roomID);
 
 	boolean addNewClassRoom(ClassRoom classRoom, int roomID);
+
+	Page<ClassRoom> getClassRoomBySemesterAndCourseAndClass (Integer courseId, Integer classId, Integer roomId, Pageable pageable);
+
 	
 }

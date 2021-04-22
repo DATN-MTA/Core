@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.mta.model.Class;
@@ -108,6 +110,24 @@ public class ClassServiceImpl1 implements ClassService {
 			return null;
 		}
 		return listClasses;
+	}
+
+	@Override
+	public Page<Class> getAllClasses(Pageable pageable) {
+		return this.classRepository.findAll(pageable);
+	}
+
+	@Override
+	public Page<Class> getClassesBySemesterAndCourse(Pageable pageable, Integer semesterId, Integer courseId) {
+		if (semesterId != null && courseId != null) {
+			return this.classRepository.findBySemesterIDAndCourseID(semesterId, courseId, pageable);
+		} else if (semesterId != null) {
+			return this.classRepository.findBySemesterID(semesterId, pageable);
+		} else if (courseId != null) {
+			return this.classRepository.findByCourseID(courseId, pageable);
+		} else {
+			return this.classRepository.findAll(pageable);
+		}
 	}
 
 }

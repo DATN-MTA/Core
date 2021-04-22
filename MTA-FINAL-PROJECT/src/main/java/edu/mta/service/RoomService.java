@@ -4,6 +4,8 @@ package edu.mta.service;
 import java.util.List;
 
 import edu.mta.model.Room;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RoomService {
 
@@ -35,6 +37,8 @@ public interface RoomService {
 
 	Room findRoomByMacAddr(String macAddress);
 
-	List<Room> findAllSemester();
+	List<Room> findAllRooms();
+
+	Page<Room> findAllRooms(Pageable pageable);
 
 }
