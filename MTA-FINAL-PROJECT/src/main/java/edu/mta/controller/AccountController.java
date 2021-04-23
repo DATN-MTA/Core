@@ -95,7 +95,7 @@ public class AccountController {
 
 			// in the first login, student will be redirect to Update info page
 			if (account.getRole() == AccountRole.STUDENT.getValue()) {
-				if (account.getImei() == null || account.getImei().isBlank()) {
+				if (account.getImei() == null || account.getImei().isEmpty()) {
 					account.setImei(null);
 				}
 			}
@@ -541,7 +541,7 @@ public class AccountController {
 			Account account = this.accountService.findAccountByEmailAndPassword(email, password);
 			if (account != null) {
 				String userInfo = account.getUserInfo();
-				if (userInfo == null || userInfo.isBlank()) {
+				if (userInfo == null || userInfo.isEmpty()) {
 					report = new ReportError(23, "This user info has not existed yet!");
 					return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
 				}

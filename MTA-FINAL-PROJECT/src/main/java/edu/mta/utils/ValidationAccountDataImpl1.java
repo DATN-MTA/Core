@@ -10,7 +10,7 @@ public class ValidationAccountDataImpl1 implements ValidationAccountData {
 
 	@Override
 	public String validateEmailData(String email) {
-		if (email == null || email.isBlank()) {
+		if (email == null || email.isEmpty()) {
 			return "Missing email info!";
 		} else {
 			if (!email.contains("@") || !email.contains(".com")) {
@@ -22,7 +22,7 @@ public class ValidationAccountDataImpl1 implements ValidationAccountData {
 
 	@Override
 	public String validatePasswordData(String password) {
-		if (password == null || password.isBlank()) {
+		if (password == null || password.isEmpty()) {
 			return "Missing password info!";
 		}
 		return null;
@@ -30,7 +30,7 @@ public class ValidationAccountDataImpl1 implements ValidationAccountData {
 
 	@Override
 	public String validateUsernameData(String username) {
-		if (username == null || username.isBlank()) {
+		if (username == null || username.isEmpty()) {
 			return "Missing username info!";
 		}
 		return null;
@@ -64,7 +64,7 @@ public class ValidationAccountDataImpl1 implements ValidationAccountData {
 
 	@Override
 	public String validateImeiData(String imei) {
-		if (imei == null || imei.isBlank()) {
+		if (imei == null || imei.isEmpty()) {
 			return "Missing imei info!";
 		}
 		return null;

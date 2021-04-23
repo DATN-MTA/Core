@@ -81,7 +81,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentIDAndClassIDAndStatus(studentID,
 				classID, IsLearning.LEARNING.getValue());
 
-		if (studentClass.isEmpty()) {
+		if (studentClass == null) {
 			System.out.println("\n\nMile 1");
 			return "Mile1";
 		}
@@ -129,7 +129,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		String listRollCall = null;
 		String isChecked = null;
 
-		if (studentClass.isEmpty()) {
+		if (studentClass == null) {
 			return "Not found student-class";
 		}
 
@@ -191,7 +191,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	public boolean checkStudentIsLearning(int studentID, int classID) {
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentIDAndClassIDAndStatus(studentID,
 				classID, IsLearning.LEARNING.getValue());
-		if (studentClass.isEmpty()) {
+		if (studentClass == null) {
 			return false;
 		}
 
@@ -225,7 +225,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	public boolean checkStudentIsLearning(String studentEmail, int classID) {
 		Optional<StudentClass> studentClass = this.studentClassRepository
 				.findByStudentEmailAndClassIDAndStatus(studentEmail, classID, IsLearning.LEARNING.getValue());
-		if (studentClass.isEmpty()) {
+		if (studentClass == null) {
 			return false;
 		}
 
@@ -472,7 +472,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentEmailAndClassIDAndStatus(
 				studentRollcall.getDescription(), classID, IsLearning.LEARNING.getValue());
-		if (studentClass.isEmpty()) {
+		if (studentClass == null) {
 			return "Not found student-class";
 		}
 
@@ -483,7 +483,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		LocalTime checkTime = rollcallAt.toLocalTime();
 		Optional<ClassRoom> classRoomOpt = this.classRoomRepository.findByClassIDAndRoomIDAndWeekday(classID, roomID,
 				weekday, checkTime);
-		if (classRoomOpt.isEmpty()) {
+		if (classRoomOpt == null) {
 			return "Not in lesson's duration!";
 		}
 

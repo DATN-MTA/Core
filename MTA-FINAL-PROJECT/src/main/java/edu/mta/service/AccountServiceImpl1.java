@@ -78,7 +78,7 @@ public class AccountServiceImpl1 implements AccountService {
 	@Override
 	public Account updateAccountInfo(Account account) {
 		Optional<Account> oldInfo = this.accountRepository.findById(account.getId());
-		if (oldInfo.isEmpty()) {
+		if (oldInfo == null) {
 			return null;
 		}
 
@@ -99,7 +99,7 @@ public class AccountServiceImpl1 implements AccountService {
 	@Override
 	public Account findAccountByID(int id) {
 		Optional<Account> account = this.accountRepository.findById(id);
-		if (account.isEmpty()) {
+		if (account == null) {
 			return null;
 		}
 
@@ -110,7 +110,7 @@ public class AccountServiceImpl1 implements AccountService {
 	public boolean updateUserInfo(User user) {
 		Optional<Account> oldInfo = this.accountRepository.findById(user.getId());
 
-		if (oldInfo.isEmpty()) {
+		if (oldInfo == null) {
 			return false;
 		}
 
@@ -137,7 +137,7 @@ public class AccountServiceImpl1 implements AccountService {
 	@Override
 	public Account findAccountByEmail(String email) {
 		Optional<Account> account = this.accountRepository.findByEmail(email);
-		if (account.isEmpty()) {
+		if (account == null) {
 			return null;
 		}
 		return account.get();

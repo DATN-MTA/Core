@@ -21,7 +21,7 @@ public class ValidationSemesterDataImpl1 implements ValidationSemesterData {
 
 	@Override
 	public String validateSemesterNameData(String semesterName) {
-		if (semesterName == null || semesterName.isBlank()) {
+		if (semesterName == null || semesterName.isEmpty()) {
 			return "Missing semesterName data!";
 		}
 		

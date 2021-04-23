@@ -68,7 +68,7 @@ public class ReportServiceImpl1 {
 			sumOfSick = 0;
 
 			listRollCall = studentClass.getListRollCall();
-			if (listRollCall == null || listRollCall.isBlank()) {
+			if (listRollCall == null || listRollCall.isEmpty()) {
 				studentRecord = new GeneralStudentRecord();
 				studentRecord.setClassName(studentClass.getClassInstance().getClassName());
 				studentRecord.setCourseName(studentClass.getClassInstance().getCourse().getCourseName());
@@ -235,7 +235,7 @@ public class ReportServiceImpl1 {
 			sumOfAbsent = 0;
 
 			listRollCall = teacherClass.getListRollCall();
-			if (listRollCall == null || listRollCall.isBlank()) {
+			if (listRollCall == null || listRollCall.isEmpty()) {
 				teacherRecord = new GeneralTeacherRecord();
 				teacherRecord.setClassName(teacherClass.getClassInstance().getClassName());
 				teacherRecord.setCourseName(teacherClass.getClassInstance().getCourse().getCourseName());
@@ -377,7 +377,7 @@ public class ReportServiceImpl1 {
 			listRollCallRecord.clear();
 			listRollCallRaw = studentClass.getListRollCall();
 			
-			if (listRollCallRaw == null || listRollCallRaw.isBlank()) {
+			if (listRollCallRaw == null || listRollCallRaw.isEmpty()) {
 				record = new DetailRecordForClass();
 				studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0];
 				record.setStudentName(studentName);

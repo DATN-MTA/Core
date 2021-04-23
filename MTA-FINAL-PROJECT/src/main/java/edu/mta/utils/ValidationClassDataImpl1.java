@@ -17,7 +17,7 @@ public class ValidationClassDataImpl1 implements ValidationClassData {
 
 	@Override
 	public String validateClassNameData(String className) {
-		if (className == null || className.isBlank()) {
+		if (className == null || className.isEmpty()) {
 			return "Missing roomName data!";
 		}
 		return null;

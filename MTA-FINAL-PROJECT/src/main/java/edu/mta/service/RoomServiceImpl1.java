@@ -62,7 +62,7 @@ public class RoomServiceImpl1 implements RoomService {
 	@Override
 	public double calculateDistanceBetween2GPSCoord(int roomID, double gpsLong, double gpsLa) {
 		Optional<Room> room = this.roomRepository.findById(roomID);
-		if (room.isEmpty()) {
+		if (room == null) {
 			return Integer.MAX_VALUE;
 		}
 

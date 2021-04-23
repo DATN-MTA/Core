@@ -17,7 +17,7 @@ public class ValidationCourseDataImpl1 implements ValidationCourseData {
 
 	@Override
 	public String validateCourseNameData(String courseName) {
-		if (courseName == null || courseName.isBlank()) {
+		if (courseName == null || courseName.isEmpty()) {
 			return "Missing semesterName data!";
 		}
 		return null;

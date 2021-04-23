@@ -206,7 +206,7 @@ public class ClassRoomServiceImpl1 implements ClassRoomService {
 			System.out.println("className = " + className);
 			
 			Optional<Class> classOpt = this.classRepository.findByClassName(className);
-			if (classOpt == null || classOpt.isEmpty()) {
+			if (classOpt == null) {
 				System.out.println("============= class is not exist");
 				listOfInvalidRows += rowCounter + ", ";
 				listIte.remove();
