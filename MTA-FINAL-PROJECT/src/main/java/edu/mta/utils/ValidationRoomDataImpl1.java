@@ -17,7 +17,7 @@ public class ValidationRoomDataImpl1 implements ValidationRoomData{
 
 	@Override
 	public String validateRoomNameData(String roomName) {
-		if (roomName == null || roomName.isBlank()) {
+		if (roomName == null || roomName.isEmpty()) {
 			return "Missing roomName data!";
 		}
 		return null;
@@ -25,7 +25,7 @@ public class ValidationRoomDataImpl1 implements ValidationRoomData{
 
 	@Override
 	public String validateAddressData(String address) {
-		if (address == null || address.isBlank()) {
+		if (address == null || address.isEmpty()) {
 			return "Missing address data!";
 		}
 		return null;

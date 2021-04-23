@@ -175,7 +175,7 @@ public class UncategorizedController {
 			rollCallString = null;
 
 			teacherClass = this.teacherClassService.findCurrentTeacherByClassID(classRoom.getClassInstance().getId());
-			if (teacherClass.getListRollCall() != null && !teacherClass.getListRollCall().isBlank()) {
+			if (teacherClass.getListRollCall() != null && !teacherClass.getListRollCall().isEmpty()) {
 				indexOf = teacherClass.getListRollCall().indexOf(regexDate);
 
 				// if list has no record for today => not roll call
@@ -224,7 +224,7 @@ public class UncategorizedController {
 
 					System.out.println("\n\n indexOf = " + indexOf);
 					// TH list rong
-					if (rollCallString == null || rollCallString.isBlank()) {
+					if (rollCallString == null || rollCallString.isEmpty()) {
 						newRollCallList = null;
 					} else {
 						newRollCallList = teacherClass.getListRollCall().substring(0, indexOf).concat(rollCallString);
@@ -366,7 +366,7 @@ public class UncategorizedController {
 				
 				//list = null => cant call indexOf = missing rollcall
 				//check isTeacher => mark
-				if (studentClass.getListRollCall() == null || studentClass.getListRollCall().isBlank()) {
+				if (studentClass.getListRollCall() == null || studentClass.getListRollCall().isEmpty()) {
 					if (isTeacheRollCalled == false) {
 						newRollCallList = message2;
 					} else {
@@ -457,7 +457,7 @@ public class UncategorizedController {
 						}
 					}
 
-					if (rollCallString == null || rollCallString.isBlank()) {
+					if (rollCallString == null || rollCallString.isEmpty()) {
 						newRollCallList = null;
 					} else {
 						newRollCallList = studentClass.getListRollCall().substring(0, indexOf).concat(rollCallString);

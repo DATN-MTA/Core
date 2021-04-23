@@ -94,7 +94,7 @@ public class BirtRuner {
 	public static String runBirtReport(String fileReportName, Map<String, Object> jsonMap, String fileName,
 			String folderSymbolicLink) throws FileNotFoundException {
 		
-		if (fileReportName == null || fileReportName.isBlank()) {
+		if (fileReportName == null || fileReportName.isEmpty()) {
 			return null;
 		}
 
@@ -118,7 +118,7 @@ public class BirtRuner {
 			}
 			
 			//if not have link to folder => auto choose Out folder
-			if (folderSymbolicLink == null || folderSymbolicLink.isBlank()) {
+			if (folderSymbolicLink == null || folderSymbolicLink.isEmpty()) {
 				pathFile = GeneralValue.LINK_OUT_REPORT_IN_SERVER;
 			} else {
 				pathFile = folderSymbolicLink;

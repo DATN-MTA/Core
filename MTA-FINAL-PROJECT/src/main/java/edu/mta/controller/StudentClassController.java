@@ -133,19 +133,19 @@ public class StudentClassController {
 			}
 
 			imei = jsonMap.get("imei").toString();
-			if (imei == null || imei.isBlank()) {
+			if (imei == null || imei.isEmpty()) {
 				report = new ReportError(93, "Missing IMEI info");
 				return ResponseEntity.badRequest().body(report);
 			}
 
 //			macAddr = jsonMap.get("macAddr").toString();
-//			if (macAddr == null || macAddr.isBlank()) {
+//			if (macAddr == null || macAddr.isEmpty()) {
 //				report = new ReportError(92, "Missing MAC address");
 //				return ResponseEntity.badRequest().body(report);
 //			}
 
 			identifyString = jsonMap.get("identifyString").toString();
-			if (identifyString == null || identifyString.isBlank()) {
+			if (identifyString == null || identifyString.isEmpty()) {
 				report = new ReportError(94, "You have to scan the right QR code to rollcall");
 				return ResponseEntity.badRequest().body(report);
 			}

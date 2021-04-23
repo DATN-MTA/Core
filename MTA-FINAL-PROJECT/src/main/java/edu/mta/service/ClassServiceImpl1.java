@@ -68,7 +68,7 @@ public class ClassServiceImpl1 implements ClassService {
 	public boolean checkAddingTime(LocalDate addingDate, int semesterId) {
 		// check if semesterId is valid
 		Optional<Semester> semester = this.semesterRepository.findById(semesterId);
-		if (semester.isEmpty()) {
+		if (semester == null) {
 			return false;
 		}
 
@@ -82,7 +82,7 @@ public class ClassServiceImpl1 implements ClassService {
 	@Override
 	public Class findClassByClassName(String className) {
 		Optional<Class> classInstance = this.classRepository.findByClassName(className);
-		if (classInstance.isEmpty()) {
+		if (classInstance == null) {
 			return null;
 		}
 		return classInstance.get();

@@ -565,7 +565,7 @@ public class AccountController {
 			if (account != null) {
 				/* //need_change
 				String userInfo = account.getUserInfo();
-				if (userInfo == null || userInfo.isBlank()) {
+				if (userInfo == null || userInfo.isEmpty()) {
 					report = new ReportError(23, "This user info has not existed yet!");
 					return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
 				} */

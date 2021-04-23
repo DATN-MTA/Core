@@ -69,7 +69,7 @@ public class CourseController {
 			//if request has courseID -> must be removed
 			course.setCourseID(-1);
 			
-			if (course.getDescription().isBlank()) {
+			if (course.getDescription().isEmpty()) {
 				course.setDescription(null);
 			}
 			

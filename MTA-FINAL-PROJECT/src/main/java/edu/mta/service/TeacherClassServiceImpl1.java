@@ -94,7 +94,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<TeacherClass> teacherClass = this.teacherClassRepository.findByTeacherIDAndClassIDAndStatus(teacherID,
 				classID, IsTeaching.TEACHING.getValue());
 
-		if (teacherClass.isEmpty()) {
+		if (teacherClass == null) {
 			return false;
 		}
 
@@ -206,7 +206,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		String newValue = null;
 		String listRollCall = null;
 
-		if (teacherClass.isEmpty()) {
+		if (teacherClass == null) {
 			return false;
 		}
 
@@ -245,7 +245,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 	public TeacherClass findCurrentTeacherByClassID(int classID) {
 		Optional<TeacherClass> teacherClass = this.teacherClassRepository.findByClassIDAndStatus(classID,
 				IsTeaching.TEACHING.getValue());
-		if (teacherClass.isEmpty()) {
+		if (teacherClass == null) {
 			return null;
 		}
 		return teacherClass.get();
@@ -270,7 +270,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<StudentClass> studentClass = this.studentClassRepository
 				.findByStudentEmailAndClassIDAndStatus(studentEmail, classID, IsLearning.LEARNING.getValue());
 
-		if (classRoom.isEmpty() || studentClass.isEmpty()) {
+		if (classRoom == null || studentClass == null) {
 			return false;
 		}
 
@@ -279,7 +279,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		String classIsChecked = studentClassInstance.getClassInstance().getIsChecked();
 
 		// checkedTime empty => this class is still not rollcall => not allow teacher
-		if (classIsChecked == null || classIsChecked.isBlank()) {
+		if (classIsChecked == null || classIsChecked.isEmpty()) {
 			return false;
 		}
 
@@ -304,7 +304,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		}
 
 		isChecked = studentClassInstance.getIsChecked();
-		if (isChecked != null && !isChecked.isBlank() && !this.studentClassService.checkIsCheckedValid(isChecked,
+		if (isChecked != null && !isChecked.isEmpty() && !this.studentClassService.checkIsCheckedValid(isChecked,
 				classRoom.get().getBeginAt(), classRoom.get().getFinishAt())) {
 			System.out.println("\n\nMile 3");
 			return false;
@@ -506,7 +506,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<TeacherClass> teacherClassOpt = this.teacherClassRepository.findByClassIDAndStatus(classID,
 				IsTeaching.TEACHING.getValue());
 
-		if (teacherClassOpt.isEmpty()) {
+		if (teacherClassOpt == null) {
 			return false;
 		}
 

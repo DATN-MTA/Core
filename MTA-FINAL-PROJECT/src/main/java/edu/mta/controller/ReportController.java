@@ -167,7 +167,7 @@ public class ReportController {
 			//String symbolicLink = BaseService.genSymLink(reportPath);
 			String symbolicLink = null;
 
-			if (symbolicLink == null || symbolicLink.isBlank()) {
+			if (symbolicLink == null || symbolicLink.isEmpty()) {
 				// logger.info("GEN SYMBOLICLINK ERROR");
 				output.setErrorCode(GeneralValue.GEN_SYMBOLIC_FAIL);
 				output.setDescription("Generate symbolic link failed!");
@@ -292,7 +292,7 @@ public class ReportController {
 			System.out.println("\n\n reportPath = " + reportPath);
 			String symbolicLink = BaseService.genSymLink(reportPath);
 
-			if (symbolicLink == null || symbolicLink.isBlank()) {
+			if (symbolicLink == null || symbolicLink.isEmpty()) {
 				// logger.info("GEN SYMBOLICLINK ERROR");
 				output.setErrorCode(GeneralValue.GEN_SYMBOLIC_FAIL);
 				output.setDescription("Generate symbolic link failed!");
@@ -399,7 +399,7 @@ public class ReportController {
 			System.out.println("\n\n reportPath = " + reportPath);
 			String symbolicLink = BaseService.genSymLink(reportPath);
 
-			if (symbolicLink == null || symbolicLink.isBlank()) {
+			if (symbolicLink == null || symbolicLink.isEmpty()) {
 				// logger.info("GEN SYMBOLICLINK ERROR");
 				output.setErrorCode(GeneralValue.GEN_SYMBOLIC_FAIL);
 				output.setDescription("Generate symbolic link failed!");
