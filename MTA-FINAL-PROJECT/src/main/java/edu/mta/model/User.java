@@ -1,10 +1,12 @@
 package edu.mta.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "user")
@@ -25,6 +27,7 @@ public class User implements Serializable {
 	private String fullName;
 
 	@Column(name = "birthday", nullable = false, length = 200)
+        @JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate birthDay;
 
 	@Column(name = "phone", length = 200)
@@ -38,7 +41,7 @@ public class User implements Serializable {
 
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "account_id")
 	private Account account;
 	
 	public User() {

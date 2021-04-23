@@ -1,5 +1,6 @@
 package edu.mta.service;
 
+import edu.mta.dto.AccountDataDTO;
 import edu.mta.model.Account;
 import edu.mta.model.User;
 
@@ -46,5 +47,5 @@ public interface AccountService {
 
 	String signin(String username, String password);
 
-	String signup(Account account);
+	String signup(AccountDataDTO accountDataDTO);
 }

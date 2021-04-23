@@ -71,7 +71,7 @@ public class AccountController {
 			@ApiResponse(code = 403, message = "Access denied"), //
 			@ApiResponse(code = 422, message = "Username is already in use")})
 	public String signup(@ApiParam("Signup User") @RequestBody AccountDataDTO accountDataDTO) {
-		return accountService.signup(modelMapper.map(accountDataDTO, Account.class));
+		return accountService.signup(accountDataDTO);
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)

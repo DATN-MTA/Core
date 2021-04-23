@@ -1,6 +1,7 @@
 package edu.mta.dto;
 
 import edu.mta.model.Role;
+import edu.mta.model.User;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -15,6 +16,9 @@ public class AccountDataDTO {
     private String password;
     @ApiModelProperty(position = 3)
     List<Role> roles;
+    
+    @ApiModelProperty(position = 4)
+    private UserDTO user;
 //    @ApiModelProperty(position = 4)
 //    private User user;
 
@@ -50,12 +54,12 @@ public class AccountDataDTO {
         this.roles = roles;
     }
 
-//    public User getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+    }
 }
 
