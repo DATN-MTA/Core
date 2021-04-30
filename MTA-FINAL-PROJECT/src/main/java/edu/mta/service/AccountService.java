@@ -4,6 +4,8 @@ import edu.mta.dto.AccountDataDTO;
 import edu.mta.model.Account;
 import edu.mta.model.User;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author BePro
  *
@@ -48,4 +50,6 @@ public interface AccountService {
 	String signin(String username, String password);
 
 	String signup(AccountDataDTO accountDataDTO);
+
+	Account whoami(HttpServletRequest req);
 }
