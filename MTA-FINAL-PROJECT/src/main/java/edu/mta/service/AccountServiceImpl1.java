@@ -10,6 +10,7 @@ import edu.mta.repository.AccountRepository;
 import edu.mta.repository.UserRepository;
 import edu.mta.security.jwt.JwtTokenProvider;
 import edu.mta.utils.GeneralValue;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import org.modelmapper.ModelMapper;
 
 @Service
 @Qualifier("AccountServiceImpl1")
@@ -184,6 +185,11 @@ public class AccountServiceImpl1 implements AccountService {
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    @Override
+    public Account whoami(HttpServletRequest req) {
+        return accountRepository.getUserByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
     }
 
     @Override
