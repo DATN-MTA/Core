@@ -3,8 +3,11 @@ package edu.mta.service;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.model.Account;
 import edu.mta.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author BePro
@@ -37,7 +40,7 @@ public interface AccountService {
 	
 	Account findAccountByID(int id);
 	
-	boolean deactivateAccount(String email);
+	boolean activeOrDeactivateAccount(String email);
 	
 	boolean activateAccount(String email);
 
@@ -52,4 +55,8 @@ public interface AccountService {
 	String signup(AccountDataDTO accountDataDTO);
 
 	Account whoami(HttpServletRequest req);
+
+	boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status);
+
+	Page<Account> getAllAccount(Pageable page);
 }
