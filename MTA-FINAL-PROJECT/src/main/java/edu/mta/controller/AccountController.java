@@ -2,6 +2,7 @@ package edu.mta.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.common.Constants;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.AccountResponseDTO;
 import edu.mta.dto.UserDTO;
@@ -57,7 +58,7 @@ public class AccountController {
 	@PostMapping("/signin")
 	@ApiResponses(value = {//
 			@ApiResponse(code = 400, message = "Something went wrong"), //
-			@ApiResponse(code = 422, message = "Invalid username/password supplied")})
+			@ApiResponse(code = 422, message = "Invalid username/password supplied or account has been deactivated")})
 	public String login(//
 						@ApiParam("Username") @RequestParam String username, //
 						@ApiParam("Password") @RequestParam String password) {
@@ -203,89 +204,23 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = "/deactivateAccount", method = RequestMethod.PUT)
-	public ResponseEntity<?> disableAccount(@RequestBody String requestInfo) {
-		Map<String, Object> jsonMap = null;
-		ObjectMapper objectMapper = null;
-		String errorMessage = null;
-		String email = null;
-		ReportError report;
-
-		try {
-			objectMapper = new ObjectMapper();
-			jsonMap = objectMapper.readValue(requestInfo, new TypeReference<Map<String, Object>>() {
-			});
-
-			// check request body has enough info in right JSON format
-			if (!this.frequentlyUtils.checkKeysExist(jsonMap, "email")) {
-				report = new ReportError(1, "You have to fill all required information!");
-				return ResponseEntity.badRequest().body(report);
-			}
-
-			errorMessage = this.validationData.validateAccountData(jsonMap);
-			if (errorMessage != null) {
-				report = new ReportError(14, "Deactive account failed because " + errorMessage);
-				return ResponseEntity.badRequest().body(report);
-			}
-
-			email = jsonMap.get("email").toString();
-			if (this.accountService.deactivateAccount(email)) {
-				report = new ReportError(200, "Deactivate account successful!");
-				return ResponseEntity.ok(report);
-			}
-
-			report = new ReportError(11, "Authentication has failed or has not yet been provided!");
-			return new ResponseEntity<>(report, HttpStatus.UNAUTHORIZED);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			report = new ReportError(2, "Error happened when jackson deserialization info!");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
-		}
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> disableAccount(@RequestBody List<Integer> accountIds) {
+		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusInActive));
 	}
 
 	@RequestMapping(value = "/activateAccount", method = RequestMethod.PUT)
-	public ResponseEntity<?> activateAccount(@RequestBody String requestInfo) {
-		Map<String, Object> jsonMap = null;
-		ObjectMapper objectMapper = null;
-		String errorMessage = null;
-		String email = null;
-//		String password = null;
-//		int role = -1;
-		ReportError report;
-
-		try {
-			objectMapper = new ObjectMapper();
-			jsonMap = objectMapper.readValue(requestInfo, new TypeReference<Map<String, Object>>() {
-			});
-
-			// check request body has enough info in right JSON format
-			if (!this.frequentlyUtils.checkKeysExist(jsonMap, "email")) {
-				report = new ReportError(1, "You have to fill all required information!");
-				return ResponseEntity.badRequest().body(report);
-			}
-
-			errorMessage = this.validationData.validateAccountData(jsonMap);
-			if (errorMessage != null) {
-				report = new ReportError(15, "Active account failed because " + errorMessage);
-				return ResponseEntity.badRequest().body(report);
-			}
-
-			email = jsonMap.get("email").toString();
-			//password = jsonMap.get("password").toString();
-			//role = Integer.parseInt(jsonMap.get("role").toString());
-			if (this.accountService.activateAccount(email)) {
-				report = new ReportError(200, "Activate account successful!");
-				return ResponseEntity.ok(report);
-			}
-
-			report = new ReportError(11, "Authentication has failed or has not yet been provided!");
-			return new ResponseEntity<>(report, HttpStatus.UNAUTHORIZED);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			report = new ReportError(2, "Error happened when jackson deserialization info!");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
-		}
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> activateAccount(@RequestBody List<Integer> accountIds) {
+		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusActive));
 	}
 
 	@RequestMapping(value = "/accounts", method = RequestMethod.GET)

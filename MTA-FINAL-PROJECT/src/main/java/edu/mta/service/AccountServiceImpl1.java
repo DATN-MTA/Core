@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -74,7 +75,7 @@ public class AccountServiceImpl1 implements AccountService {
     }
 
     @Override
-    public boolean deactivateAccount(String email) {
+    public boolean activeOrDeactivateAccount(String email) {
         Optional<Account> account = this.accountRepository.findByEmail(email);
         if (account.isPresent()) {
             Account target = account.get();
@@ -190,6 +191,16 @@ public class AccountServiceImpl1 implements AccountService {
     @Override
     public Account whoami(HttpServletRequest req) {
         return accountRepository.getUserByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+    }
+
+    @Override
+    public boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status) {
+        for (Integer accountId : acountIds) {
+            Account account = accountRepository.getOne(accountId);
+            account.setIsActive(status);
+            accountRepository.save(account);
+        }
+        return true;
     }
 
     @Override

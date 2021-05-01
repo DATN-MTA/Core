@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer>{
 
-	@Query("SELECT u FROM Account u WHERE u.username = :username")
+	@Query("SELECT u FROM Account u WHERE u.username = :username and u.isActive = 1")
 	public Account getUserByUsername(@Param("username") String username);
 
 	boolean existsByUsername(String username);
