@@ -206,8 +206,10 @@ public class AccountServiceImpl1 implements AccountService {
     }
 
     @Override
-    public Page<Account> getAllAccount(Pageable page) {
+    public Page<Account> getAllAccount(Pageable page, String emailOrUserName) {
+        if (emailOrUserName == null)
         return accountRepository.findAll(page);
+        return accountRepository.findByUsernameContainingOrEmailContaining(emailOrUserName, page);
     }
 
     @Override

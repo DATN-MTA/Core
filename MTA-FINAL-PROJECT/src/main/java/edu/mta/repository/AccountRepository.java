@@ -1,6 +1,8 @@
 package edu.mta.repository;
 
 import edu.mta.model.Account;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,9 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 
 	@Query("SELECT u FROM Account u WHERE u.username = :username and u.isActive = 1")
 	public Account getUserByUsername(@Param("username") String username);
+
+	@Query("SELECT u FROM Account u WHERE u.username  LIKE CONCAT('%',:usernameOrEmail,'%') or u.email LIKE CONCAT('%',:usernameOrEmail,'%')")
+	Page<Account> findByUsernameContainingOrEmailContaining(@Param("usernameOrEmail") String emailOrUserName, Pageable pageable);
 
 	boolean existsByUsername(String username);
 	

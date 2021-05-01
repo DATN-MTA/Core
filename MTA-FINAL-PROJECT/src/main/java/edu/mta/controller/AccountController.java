@@ -99,9 +99,10 @@ public class AccountController {
 			@ApiResponse(code = 403, message = "Access denied"), //
 			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
 	public ResponseEntity<?> getAllAccount(@RequestParam(required = false) Integer page,
-												  @RequestParam(required = false) Integer pageSize) {
+										   @RequestParam(required = false) Integer pageSize,
+										   @RequestParam(value = "emailOrUserName", required = false) String emailOrUserName) {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
-		Page<Account> pageAccounts = this.accountService.getAllAccount(pageRequest != null ? pageRequest : null);
+		Page<Account> pageAccounts = this.accountService.getAllAccount(pageRequest != null ? pageRequest : null, emailOrUserName);
 		List<Account> accountList = pageAccounts.getContent();
 		List<AccountResponseDTO> accountResponseDTOList = new ArrayList<>();
 		for (Account account: accountList) {
@@ -257,39 +258,6 @@ public class AccountController {
 			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
 	public ResponseEntity<?> activateAccount(@RequestBody List<Integer> accountIds) {
 		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusActive));
-	}
-
-	@RequestMapping(value = "/accounts", method = RequestMethod.GET)
-	public ResponseEntity<?> getAccountInfo(@RequestHeader(value = "email", required = true) String email,
-			@RequestHeader(value = "password", required = true) String password) {
-		Map<String, Object> jsonMap = null;
-		String errorMessage = null;
-		ReportError report;
-
-		try {
-			jsonMap = new HashMap<>();
-			jsonMap.put("email", email);
-			jsonMap.put("password", password);
-
-			errorMessage = this.validationData.validateAccountData(jsonMap);
-			if (errorMessage != null) {
-				report = new ReportError(16, "Getting account info failed because " + errorMessage);
-				return ResponseEntity.badRequest().body(report);
-			}
-
-			Account account = this.accountService.findAccountByEmailAndPassword(email, password);
-			if (account != null) {
-				return ResponseEntity.ok(account);
-			}
-
-			report = new ReportError(11, "Authentication has failed or has not yet been provided!");
-			return new ResponseEntity<>(report, HttpStatus.UNAUTHORIZED);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			report = new ReportError(2, "Error happened when jackson deserialization info!");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
-		}
 	}
 
 	@RequestMapping(value = "/accounts", method = RequestMethod.PUT)
