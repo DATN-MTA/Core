@@ -15,6 +15,8 @@ public class AccountResponseDTO {
     private String email;
     @ApiModelProperty(position = 3)
     List<Role> roles;
+    @ApiModelProperty(position = 4)
+    private int isActive;
 
     public Integer getId() {
         return id;
@@ -48,4 +50,11 @@ public class AccountResponseDTO {
         this.roles = roles;
     }
 
+    public int getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(int isActive) {
+        this.isActive = isActive;
+    }
 }
