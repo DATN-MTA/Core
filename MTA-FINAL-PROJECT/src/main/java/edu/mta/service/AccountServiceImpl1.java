@@ -13,6 +13,8 @@ import edu.mta.utils.GeneralValue;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -201,6 +203,11 @@ public class AccountServiceImpl1 implements AccountService {
             accountRepository.save(account);
         }
         return true;
+    }
+
+    @Override
+    public Page<Account> getAllAccount(Pageable page) {
+        return accountRepository.findAll(page);
     }
 
     @Override

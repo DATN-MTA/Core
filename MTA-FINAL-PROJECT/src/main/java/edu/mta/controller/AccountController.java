@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.common.Constants;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.AccountResponseDTO;
-import edu.mta.dto.UserDTO;
+import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.enumData.AccountStatus;
 import edu.mta.model.Account;
 import edu.mta.model.ReportError;
@@ -18,6 +18,9 @@ import io.swagger.annotations.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,8 +88,40 @@ public class AccountController {
 	public AccountResponseDTO whoami(HttpServletRequest req) {
 		Account account = accountService.whoami(req);
 		AccountResponseDTO accountResponseDTO = modelMapper.map(account, AccountResponseDTO.class);
-		accountResponseDTO.setUserDTO(modelMapper.map(account.getUser(), UserDTO.class));
+		accountResponseDTO.setUserDTO(modelMapper.map(account.getUser(), UserDataResponseDTO.class));
 		return accountResponseDTO;
+	}
+
+	@GetMapping(value = "/getAllAccounts")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> getAllAccount(@RequestParam(required = false) Integer page,
+												  @RequestParam(required = false) Integer pageSize) {
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<Account> pageAccounts = this.accountService.getAllAccount(pageRequest != null ? pageRequest : null);
+		List<Account> accountList = pageAccounts.getContent();
+		List<AccountResponseDTO> accountResponseDTOList = new ArrayList<>();
+		for (Account account: accountList) {
+			AccountResponseDTO accountResponseDTO = modelMapper.map(account, AccountResponseDTO.class);
+			accountResponseDTO.setUserDTO(modelMapper.map(account.getUser(), UserDataResponseDTO.class));
+			accountResponseDTOList.add(accountResponseDTO);
+		}
+		if (pageAccounts == null) {
+			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			if (pageAccounts != null) {
+				response.put("data", accountResponseDTOList);
+				response.put("totalPages", pageAccounts.getTotalPages());
+				response.put("totalItems", pageAccounts.getTotalElements());
+				response.put("currentPage", pageAccounts.getNumber());
+				return ResponseEntity.ok(response);
+			}
+		}
+		return null;
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
