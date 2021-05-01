@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.AccountResponseDTO;
+import edu.mta.dto.UserDTO;
 import edu.mta.enumData.AccountStatus;
 import edu.mta.model.Account;
 import edu.mta.model.ReportError;
@@ -80,7 +81,10 @@ public class AccountController {
 			@ApiResponse(code = 403, message = "Access denied"), //
 			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
 	public AccountResponseDTO whoami(HttpServletRequest req) {
-		return modelMapper.map(accountService.whoami(req), AccountResponseDTO.class);
+		Account account = accountService.whoami(req);
+		AccountResponseDTO accountResponseDTO = modelMapper.map(account, AccountResponseDTO.class);
+		accountResponseDTO.setUserDTO(modelMapper.map(account.getUser(), UserDTO.class));
+		return accountResponseDTO;
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
