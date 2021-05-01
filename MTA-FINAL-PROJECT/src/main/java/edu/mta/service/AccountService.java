@@ -58,5 +58,5 @@ public interface AccountService {
 
 	boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status);
 
-	Page<Account> getAllAccount(Pageable page);
+	Page<Account> getAllAccount(Pageable page, String emailOrUserName);
 }
