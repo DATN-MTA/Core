@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.common.Constants;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.AccountResponseDTO;
+import edu.mta.dto.ResetPasswordRequest;
 import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.enumData.AccountStatus;
+import edu.mta.exception.CustomException;
 import edu.mta.model.Account;
 import edu.mta.model.ReportError;
 import edu.mta.model.User;
@@ -15,6 +17,7 @@ import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationAccountData;
 import edu.mta.utils.ValidationData;
 import io.swagger.annotations.*;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -259,6 +263,23 @@ public class AccountController {
 	public ResponseEntity<?> activateAccount(@RequestBody List<Integer> accountIds) {
 		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusActive));
 	}
+
+	@RequestMapping(path = "/updatePassword", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, method = RequestMethod.POST)
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public boolean updatePassword(@RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest req) {
+		if (!resetPasswordRequest.getNewPassword().equals(resetPasswordRequest.getConfirmPassword())) {
+			throw new CustomException("password and confirm pwd is not equals", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		if (StringUtils.isEmpty(resetPasswordRequest.getNewPassword())) {
+			throw new CustomException("password or confirm password is not presented", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		return accountService.updatePassword(resetPasswordRequest.getEmail(), resetPasswordRequest.getNewPassword(), req);
+	}
+
+
 
 	@RequestMapping(value = "/accounts", method = RequestMethod.PUT)
 	public ResponseEntity<?> updateAccountInfo(@RequestHeader(value = "email") String email,

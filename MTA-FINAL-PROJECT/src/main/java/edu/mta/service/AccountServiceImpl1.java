@@ -221,4 +221,24 @@ public class AccountServiceImpl1 implements AccountService {
         return account.get();
     }
 
+    @Override
+    public boolean updatePassword(String email, String password, HttpServletRequest req) {
+        Account temp = null;
+        Optional<Account> optionalAccount;
+        if (email != null && !email.isEmpty()) {
+            optionalAccount= accountRepository.findByEmail(email);
+            if (optionalAccount.isPresent()) {
+                temp = optionalAccount.get();
+            }
+        } else {
+            temp = accountRepository.getUserByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+        }
+        if (temp != null) {
+            temp.setPassword(passwordEncoder.encode(password));
+            accountRepository.save(temp);
+            return true;
+        }
+        return false;
+    }
+
 }
