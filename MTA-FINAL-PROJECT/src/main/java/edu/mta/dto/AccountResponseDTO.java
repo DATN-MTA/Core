@@ -17,6 +17,8 @@ public class AccountResponseDTO {
     List<Role> roles;
     @ApiModelProperty(position = 4)
     private int isActive;
+    @ApiModelProperty(position = 5)
+    private UserDTO userDTO;
 
     public Integer getId() {
         return id;
@@ -56,5 +58,13 @@ public class AccountResponseDTO {
 
     public void setIsActive(int isActive) {
         this.isActive = isActive;
+    }
+
+    public UserDTO getUserDTO() {
+        return userDTO;
+    }
+
+    public void setUserDTO(UserDTO userDTO) {
+        this.userDTO = userDTO;
     }
 }
