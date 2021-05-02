@@ -149,6 +149,7 @@ public class AccountServiceImpl1 implements AccountService {
     public boolean activeOrInactiveSingleAccount(Integer accountId, Integer status) {
         Account account = accountRepository.getOne(accountId);
         account.setIsActive(account.getIsActive() == 0 ? 1 : 0);
+        accountRepository.save(account);
         return true;
     }
 
