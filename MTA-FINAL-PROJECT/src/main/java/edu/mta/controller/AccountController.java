@@ -110,6 +110,19 @@ public class AccountController {
 		return accountResponseDTO;
 	}
 
+	@GetMapping(value = "/getUserInfo")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public AccountResponseDTO getUserInfo(@RequestParam(value = "accountId", required = true) Integer accountId) {
+		Account account = accountService.getUserInfo(accountId);
+		AccountResponseDTO accountResponseDTO = modelMapper.map(account, AccountResponseDTO.class);
+		accountResponseDTO.setUserDTO(modelMapper.map(account.getUser(), UserDataResponseDTO.class));
+		return accountResponseDTO;
+	}
+
 	@GetMapping(value = "/getAllAccounts")
 	@PreAuthorize("hasRole('ADMIN')")
 	@ApiResponses(value = {//
