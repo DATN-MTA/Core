@@ -34,6 +34,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()//
                 .antMatchers("/signin").permitAll()//
                 .antMatchers("/signup").permitAll()//
+                .antMatchers("/forgotMyPassword").permitAll()//
+                .antMatchers("/updatePasswordAfterForgot").permitAll()//
                 .antMatchers("/h2-console/**/**").permitAll()
                 .antMatchers("/errors*").hasRole("ADMIN")
                 // Disallow everything else..

@@ -1,7 +1,7 @@
 package edu.mta.service;
 
 import edu.mta.dto.AccountDataDTO;
-import edu.mta.enumData.AccountStatus;
+import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.exception.CustomException;
 import edu.mta.mapper.AccountDTOMapper;
 import edu.mta.model.Account;
@@ -9,6 +9,7 @@ import edu.mta.model.User;
 import edu.mta.repository.AccountRepository;
 import edu.mta.repository.UserRepository;
 import edu.mta.security.jwt.JwtTokenProvider;
+import edu.mta.service.mail.EmailService;
 import edu.mta.utils.GeneralValue;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class AccountServiceImpl1 implements AccountService {
     private ModelMapper modelMapper;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     public AccountServiceImpl1(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
@@ -76,57 +80,6 @@ public class AccountServiceImpl1 implements AccountService {
         return;
     }
 
-    @Override
-    public boolean activeOrDeactivateAccount(String email) {
-        Optional<Account> account = this.accountRepository.findByEmail(email);
-        if (account.isPresent()) {
-            Account target = account.get();
-
-            target.setIsActive(AccountStatus.DISABLE.getValue());
-            this.accountRepository.save(target);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean activateAccount(String email) {
-        Optional<Account> account = this.accountRepository.findByEmail(email);
-        if (account.isPresent()) {
-            Account target = account.get();
-
-			//only admin has full right to disable all types of account;
-            //student and teacher just can only disable their own type of account
-//			if (role != AccountRole.ADMIN.getValue() && role != target.getRole()) {
-//				return false;
-//			}
-            target.setIsActive(AccountStatus.ACTIVE.getValue());
-            this.accountRepository.save(target);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public Account updateAccountInfo(Account account) {
-        Optional<Account> oldInfo = this.accountRepository.findById(account.getId());
-        if (oldInfo == null) {
-            return null;
-        }
-
-        this.accountRepository.save(account);
-        return account;
-    }
-
-    @Override
-    public void addUserInfo(User user) {
-        String userInfo = createUserInfoString(user);
-
-        Account account = this.accountRepository.findById(user.getId()).get();
-        //need_change account.setUserInfo(userInfo);
-        this.accountRepository.save(account);
-        return;
-    }
 
     @Override
     public Account findAccountByID(int id) {
@@ -138,20 +91,6 @@ public class AccountServiceImpl1 implements AccountService {
         return account.get();
     }
 
-    @Override
-    public boolean updateUserInfo(User user) {
-        Optional<Account> oldInfo = this.accountRepository.findById(user.getId());
-
-        if (oldInfo == null) {
-            return false;
-        }
-
-        Account account = oldInfo.get();
-        String userInfo = createUserInfoString(user);
-        //need_change account.setUserInfo(userInfo);
-        this.accountRepository.save(account);
-        return true;
-    }
 
     @Override
     public String createUserInfoString(User user) {
@@ -219,6 +158,46 @@ public class AccountServiceImpl1 implements AccountService {
             return null;
         }
         return account.get();
+    }
+
+    @Override
+    public boolean updatePassword(String email, String password, HttpServletRequest req) {
+        Account temp = null;
+        Optional<Account> optionalAccount;
+        if (email != null && !email.isEmpty()) {
+            optionalAccount= accountRepository.findByEmail(email);
+            if (optionalAccount.isPresent()) {
+                temp = optionalAccount.get();
+            }
+        } else {
+            temp = accountRepository.getUserByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+        }
+        if (temp != null) {
+            temp.setPassword(passwordEncoder.encode(password));
+            accountRepository.save(temp);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean forceUpdatePassword(String emailToUpdate, HttpServletRequest req) {
+        try {
+            emailService.sendResetPasswordMail(emailToUpdate, req);
+            return true;
+        } catch (Exception ex) {
+            throw new CustomException("Account not found", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    @Override
+    public boolean updateUserInfo(UserDataResponseDTO userDataDTO) {
+        if (userRepository.existsById(userDataDTO.getId())) {
+            userRepository.save(modelMapper.map(userDataDTO, User.class));
+            return true;
+        } else {
+            throw new CustomException("User not found", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
     }
 
 }
