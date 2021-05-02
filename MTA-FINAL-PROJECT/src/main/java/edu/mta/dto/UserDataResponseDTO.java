@@ -14,6 +14,7 @@ public class UserDataResponseDTO {
     private String phone;
     private String imei;
     private int updateImeiCounter;
+    private int accountId;
 
     public int getId() {
         return id;
@@ -69,5 +70,13 @@ public class UserDataResponseDTO {
 
     public void setUpdateImeiCounter(int updateImeiCounter) {
         this.updateImeiCounter = updateImeiCounter;
+    }
+
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 }

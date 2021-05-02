@@ -3,7 +3,7 @@ package edu.mta.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.common.Constants;
-import edu.mta.common.ResetPasswordDemoUtil;
+import edu.mta.common.PasswordUtil;
 import edu.mta.dto.*;
 import edu.mta.exception.CustomException;
 import edu.mta.model.Account;
@@ -194,7 +194,7 @@ public class AccountController {
 
 	@RequestMapping(value = "/forgotMyPassword", method = RequestMethod.POST)
 	public ResponseEntity<?> sendConformationMailTo(@RequestBody String sendConformationMailTo, @Context HttpServletResponse res, @Context HttpServletRequest req) {
-		if (!ResetPasswordDemoUtil.emailValidator(sendConformationMailTo)) {
+		if (!PasswordUtil.emailValidator(sendConformationMailTo)) {
 			throw new CustomException("*Plaese enter a valid email address", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		if (emailService.sendResetPasswordMail(sendConformationMailTo, req)) {

@@ -1,5 +1,6 @@
 package edu.mta.service;
 
+import edu.mta.common.PasswordUtil;
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.exception.CustomException;
@@ -117,7 +118,8 @@ public class AccountServiceImpl1 implements AccountService {
     public String signup(AccountDataDTO accountDataDTO) {
         if (!accountRepository.existsByUsername(accountDataDTO.getUsername())) {
             Account account = accountDTOMapper.createFrom(accountDataDTO);
-            account.setPassword(passwordEncoder.encode(accountDataDTO.getPassword()));
+            String password = PasswordUtil.randomPassword();
+            account.setPassword(passwordEncoder.encode(password));
             account.setIsActive(1);
             User user = modelMapper.map(accountDataDTO.getUser(), User.class);
             user.setAccount(account);
@@ -192,7 +194,8 @@ public class AccountServiceImpl1 implements AccountService {
 
     @Override
     public boolean updateUserInfo(UserDataResponseDTO userDataDTO) {
-        if (userRepository.existsById(userDataDTO.getId())) {
+        User user = userRepository.findById(userDataDTO.getId()).get();
+        if (userRepository.existsById(userDataDTO.getId()) && userDataDTO.getAccountId() == user.getAccount().getId()) {
             userRepository.save(modelMapper.map(userDataDTO, User.class));
             return true;
         } else {
