@@ -1,14 +1,16 @@
 package edu.mta.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.common.Constants;
 import edu.mta.common.PasswordUtil;
-import edu.mta.dto.*;
+import edu.mta.dto.AccountDataDTO;
+import edu.mta.dto.AccountResponseDTO;
+import edu.mta.dto.ResetPasswordRequest;
+import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.exception.CustomException;
+import edu.mta.helper.AccountExcelHelper;
 import edu.mta.model.Account;
-import edu.mta.model.ReportError;
 import edu.mta.service.AccountService;
+import edu.mta.service.exel.AccountExcelService;
 import edu.mta.service.mail.AccessTokenService;
 import edu.mta.service.mail.EmailService;
 import edu.mta.utils.FrequentlyUtils;
@@ -19,20 +21,22 @@ import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +50,11 @@ public class AccountController {
 	private ValidationAccountData validationAccountData;
 	private ValidationData validationData;
 	private FrequentlyUtils frequentlyUtils;
+
+	private AccountExcelHelper accountExcelHelper;
+
+	@Autowired
+	private AccountExcelService accountExcelService;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -144,6 +153,16 @@ public class AccountController {
 		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusInActive));
 	}
 
+	@RequestMapping(value = "/activeOrInactiveSingleAccount", method = RequestMethod.PUT)
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> activeOrInactiveSingleAccount(@RequestBody Integer accountId) {
+		return ResponseEntity.ok(accountService.activeOrInactiveSingleAccount(accountId, Constants.accoutStatusInActive));
+	}
+
 	@RequestMapping(value = "/activateAccount", method = RequestMethod.PUT)
 	@PreAuthorize("hasRole('ADMIN')")
 	@ApiResponses(value = {//
@@ -154,7 +173,7 @@ public class AccountController {
 		return ResponseEntity.ok(accountService.activeOrDeactivateAccount(accountIds, Constants.accoutStatusActive));
 	}
 
-	@RequestMapping(path = "/updatePassword", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, method = RequestMethod.POST)
+	@RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
 	@ApiResponses(value = {//
 			@ApiResponse(code = 400, message = "Something went wrong"), //
 			@ApiResponse(code = 403, message = "Access denied"), //
@@ -216,74 +235,44 @@ public class AccountController {
 		}
 	}
 
+	@RequestMapping(value = "/uploadFileToCreateMultipleAccounts", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
+		String message = "";
 
+		if (AccountExcelHelper.hasExcelFormat(file)) {
+			try {
+				accountExcelService.save(file);
 
-	@RequestMapping(value = "/createMultipleAccount", method = RequestMethod.POST)
-	public ResponseEntity<?> createMultipleAccount(@RequestBody String accountInfo) {
-		
-		ObjectMapper objectMapper = null;
-		List<Account> listAccount = null;
-		String errorMessage = null;
-		ReportError report;
-		Account account = null;
-		int invalidAccount = 0;
-		int rowCounter = 1; // Excel table: first row = info of field
-		String infoOfRow = "";
-
-		try {
-			objectMapper = new ObjectMapper();
-			listAccount = objectMapper.readValue(accountInfo, new TypeReference<List<Account>>() {
-			});
-
-			for (Account tmpAccount : listAccount) {
-				rowCounter++;
-				errorMessage = this.validationAccountData.validateUsernameData(tmpAccount.getUsername());
-				if (errorMessage != null) {
-					invalidAccount++;
-					infoOfRow += rowCounter +',';
-					continue;
-				}
-
-				errorMessage = this.validationAccountData.validatePasswordData(tmpAccount.getPassword());
-				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				String encodedPassword = passwordEncoder.encode(tmpAccount.getPassword());
-				tmpAccount.setPassword(encodedPassword);
-
-				if (errorMessage != null) {
-					invalidAccount++;
-					infoOfRow += rowCounter +',';
-					continue;
-				}
-
-				errorMessage = this.validationAccountData.validateEmailData(tmpAccount.getEmail());
-				if (errorMessage != null) {
-					invalidAccount++;
-					infoOfRow += rowCounter +',';
-					continue;
-				}
-
-				account = this.accountService.findAccountByEmail(tmpAccount.getEmail());
-				if (account != null) {
-					invalidAccount++;
-					infoOfRow += rowCounter + ", ";
-					continue;
-				}
-
-				this.accountService.saveAccount(tmpAccount);
+				message = "Uploaded the file successfully: " + file.getOriginalFilename();
+				return ResponseEntity.status(HttpStatus.OK).body("Upload file succeed");
+			} catch (Exception e) {
+				message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+				return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Could not upload the file");
 			}
-                           
-                        if (invalidAccount == 0) {
-                            report = new ReportError(200, "" + invalidAccount+ "-0");
-                        } else {
-                            report = new ReportError(200, "" + invalidAccount + "-" + infoOfRow);
-                        }
-			
-			return ResponseEntity.ok(report);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			report = new ReportError(2, "Error happened when jackson deserialization info!");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
 		}
+
+		message = "Please upload an excel file!";
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not upload the file");
+	}
+
+	@RequestMapping(path = "/downloadTemplateUploadAccounts", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<Resource> getFile() {
+		String filename = "Account_Template.xlsx";
+		InputStreamResource file = new InputStreamResource(accountExcelService.load());
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+				.contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+				.body(file);
 	}
 }
