@@ -136,6 +136,11 @@ public class AccountServiceImpl1 implements AccountService {
     }
 
     @Override
+    public Account getUserInfo(Integer accountId) {
+        return accountRepository.getOne(accountId);
+    }
+
+    @Override
     public boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status) {
         for (Integer accountId : acountIds) {
             Account account = accountRepository.getOne(accountId);

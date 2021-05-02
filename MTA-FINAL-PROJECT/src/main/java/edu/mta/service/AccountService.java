@@ -47,6 +47,8 @@ public interface AccountService {
 
 	Account whoami(HttpServletRequest req);
 
+	Account getUserInfo(Integer accountId);
+
 	boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status);
 
 	boolean activeOrInactiveSingleAccount(Integer acountIds, Integer status);
