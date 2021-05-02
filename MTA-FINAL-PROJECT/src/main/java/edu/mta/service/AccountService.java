@@ -1,6 +1,7 @@
 package edu.mta.service;
 
 import edu.mta.dto.AccountDataDTO;
+import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.model.Account;
 import edu.mta.model.User;
 import org.springframework.data.domain.Page;
@@ -61,5 +62,9 @@ public interface AccountService {
 	Page<Account> getAllAccount(Pageable page, String emailOrUserName);
 
 	boolean updatePassword(String email, String password, HttpServletRequest req);
+
+	boolean forceUpdatePassword(String emailToUpdate, HttpServletRequest request);
+
+	boolean updateUserInfo(UserDataResponseDTO userDataDTO);
 
 }

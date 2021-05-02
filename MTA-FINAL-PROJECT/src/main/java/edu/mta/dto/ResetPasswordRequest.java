@@ -1,6 +1,8 @@
 package edu.mta.dto;
 
 public class ResetPasswordRequest {
+
+    private String token ;
     private  String email;
     private  String newPassword ;
     private  String confirmPassword;
@@ -44,5 +46,13 @@ public class ResetPasswordRequest {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

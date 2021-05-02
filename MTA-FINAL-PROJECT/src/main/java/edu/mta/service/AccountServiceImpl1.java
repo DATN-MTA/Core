@@ -1,6 +1,7 @@
 package edu.mta.service;
 
 import edu.mta.dto.AccountDataDTO;
+import edu.mta.dto.UserDataResponseDTO;
 import edu.mta.enumData.AccountStatus;
 import edu.mta.exception.CustomException;
 import edu.mta.mapper.AccountDTOMapper;
@@ -9,6 +10,7 @@ import edu.mta.model.User;
 import edu.mta.repository.AccountRepository;
 import edu.mta.repository.UserRepository;
 import edu.mta.security.jwt.JwtTokenProvider;
+import edu.mta.service.mail.EmailService;
 import edu.mta.utils.GeneralValue;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,9 @@ public class AccountServiceImpl1 implements AccountService {
     
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     public AccountServiceImpl1(AccountRepository accountRepository) {
@@ -239,6 +244,26 @@ public class AccountServiceImpl1 implements AccountService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean forceUpdatePassword(String emailToUpdate, HttpServletRequest req) {
+        try {
+            emailService.sendResetPasswordMail(emailToUpdate, req);
+            return true;
+        } catch (Exception ex) {
+            throw new CustomException("Account not found", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    @Override
+    public boolean updateUserInfo(UserDataResponseDTO userDataDTO) {
+        if (userRepository.existsById(userDataDTO.getId())) {
+            userRepository.save(modelMapper.map(userDataDTO, User.class));
+            return true;
+        } else {
+            throw new CustomException("User not found", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
     }
 
 }
