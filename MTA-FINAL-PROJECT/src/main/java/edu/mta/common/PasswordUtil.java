@@ -12,8 +12,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class ResetPasswordDemoUtil {
-    private static final Logger logger = Logger.getLogger(ResetPasswordDemoUtil.class);
+public abstract class PasswordUtil {
+    private static final Logger logger = Logger.getLogger(PasswordUtil.class);
 
     // ===============SHY2 method ====================
     /**
@@ -57,6 +57,22 @@ public abstract class ResetPasswordDemoUtil {
         }
 
         return salt.toString();
+
+    }
+
+    public static String randomPassword() {
+        System.out.println("Generating Password");
+
+        String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&?{}*";
+        StringBuilder builder = new StringBuilder();
+
+        int count = 8;
+
+        while (count-- != 0) {
+            int character = (int) (Math.random() * ALPHA_NUMERIC_STRING.length());
+            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
+        }
+        return builder.toString();
 
     }
 

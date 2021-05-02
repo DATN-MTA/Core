@@ -1,6 +1,6 @@
 package edu.mta.service.mail;
 
-import edu.mta.common.ResetPasswordDemoUtil;
+import edu.mta.common.PasswordUtil;
 import edu.mta.dto.MailMessageRequest;
 import edu.mta.model.Account;
 import edu.mta.service.AccountService;
@@ -66,7 +66,7 @@ public class EmailService {
     public boolean sendMail(MailMessageRequest messageRequest) {
 
         //Validate the user's email
-        if (!ResetPasswordDemoUtil.emailValidator(messageRequest.getSentTo())) {
+        if (!PasswordUtil.emailValidator(messageRequest.getSentTo())) {
             return false;
         }
 
@@ -116,7 +116,7 @@ public class EmailService {
             return null;
         }
         //Generate Access-Token
-        String token = ResetPasswordDemoUtil.getSaltString();
+        String token = PasswordUtil.getSaltString();
         String body = createResetPasswordTemplate(req,token,sendConformationMailTo) ;
         //Inject the 'reset-password-mail.html' end-point and the Access-Token in the URL and Create the template to be sent
         MailMessageRequest message = new MailMessageRequest(sendConformationMailTo,"MTA Roll call app - Reset password for your account",body,"donotrelplay@reset.com");
@@ -153,13 +153,13 @@ public class EmailService {
      * @return {@link String}
      */
     private String createResetPasswordTemplate(HttpServletRequest req, String token ,String sendConformationMailTo)   {
-        String host = "http"+ ResetPasswordDemoUtil.getMachineHostName(req);
+        String host = "http"+ PasswordUtil.getMachineHostName(req);
         String urlToInject =null;
         String content = null;
         try {
             urlToInject = host+ "/reset-password-mail.html" + token+ "&email=" + sendConformationMailTo;
             InputStream is = getClass().getResourceAsStream("/reset-password-mail.html");
-            content =ResetPasswordDemoUtil.getEmailTemplateFromClasspath(is) ;
+            content = PasswordUtil.getEmailTemplateFromClasspath(is) ;
         } catch (Exception e) {
             log.error("Faild to inject \"Reset Password URL\" in Rest password Email template" , e);
         }
