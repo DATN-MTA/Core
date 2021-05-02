@@ -35,17 +35,7 @@ public interface AccountService {
 	 */
 	void saveAccount(Account account);
 	
-	void addUserInfo(User user);
-	
-	boolean updateUserInfo(User user);
-	
 	Account findAccountByID(int id);
-	
-	boolean activeOrDeactivateAccount(String email);
-	
-	boolean activateAccount(String email);
-
-	Account updateAccountInfo(Account account);
 
 	Account findAccountByEmail(String email);
 

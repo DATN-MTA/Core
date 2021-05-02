@@ -2,7 +2,6 @@ package edu.mta.service;
 
 import edu.mta.dto.AccountDataDTO;
 import edu.mta.dto.UserDataResponseDTO;
-import edu.mta.enumData.AccountStatus;
 import edu.mta.exception.CustomException;
 import edu.mta.mapper.AccountDTOMapper;
 import edu.mta.model.Account;
@@ -81,57 +80,6 @@ public class AccountServiceImpl1 implements AccountService {
         return;
     }
 
-    @Override
-    public boolean activeOrDeactivateAccount(String email) {
-        Optional<Account> account = this.accountRepository.findByEmail(email);
-        if (account.isPresent()) {
-            Account target = account.get();
-
-            target.setIsActive(AccountStatus.DISABLE.getValue());
-            this.accountRepository.save(target);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean activateAccount(String email) {
-        Optional<Account> account = this.accountRepository.findByEmail(email);
-        if (account.isPresent()) {
-            Account target = account.get();
-
-			//only admin has full right to disable all types of account;
-            //student and teacher just can only disable their own type of account
-//			if (role != AccountRole.ADMIN.getValue() && role != target.getRole()) {
-//				return false;
-//			}
-            target.setIsActive(AccountStatus.ACTIVE.getValue());
-            this.accountRepository.save(target);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public Account updateAccountInfo(Account account) {
-        Optional<Account> oldInfo = this.accountRepository.findById(account.getId());
-        if (oldInfo == null) {
-            return null;
-        }
-
-        this.accountRepository.save(account);
-        return account;
-    }
-
-    @Override
-    public void addUserInfo(User user) {
-        String userInfo = createUserInfoString(user);
-
-        Account account = this.accountRepository.findById(user.getId()).get();
-        //need_change account.setUserInfo(userInfo);
-        this.accountRepository.save(account);
-        return;
-    }
 
     @Override
     public Account findAccountByID(int id) {
@@ -143,20 +91,6 @@ public class AccountServiceImpl1 implements AccountService {
         return account.get();
     }
 
-    @Override
-    public boolean updateUserInfo(User user) {
-        Optional<Account> oldInfo = this.accountRepository.findById(user.getId());
-
-        if (oldInfo == null) {
-            return false;
-        }
-
-        Account account = oldInfo.get();
-        String userInfo = createUserInfoString(user);
-        //need_change account.setUserInfo(userInfo);
-        this.accountRepository.save(account);
-        return true;
-    }
 
     @Override
     public String createUserInfoString(User user) {
