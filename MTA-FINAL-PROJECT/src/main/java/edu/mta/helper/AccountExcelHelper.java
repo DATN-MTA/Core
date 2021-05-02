@@ -13,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,8 +26,8 @@ import java.util.List;
 @Component
 public class AccountExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = {"userName", "email", "roles", "fullName", "address", "birthDay", "phone"};
-    static String SHEET = "Tutorials";
+    static String[] HEADERs = {"userName", "email", "password", "roles", "fullName", "address", "birthDay", "phone"};
+    static String SHEET = "Account";
 
     @Autowired
     private ModelMapper modelMapper;
@@ -36,6 +39,25 @@ public class AccountExcelHelper {
         }
 
         return true;
+    }
+
+    public static ByteArrayInputStream generateExcel() {
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+            Sheet sheet = workbook.createSheet(SHEET);
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+
+            for (int col = 0; col < HEADERs.length; col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(HEADERs[col]);
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
+        }
     }
 
     public List<AccountDataDTO> exelToAccountDataDTO(InputStream is) {
@@ -74,7 +96,6 @@ public class AccountExcelHelper {
                         case 1:
                             accountDataDTO.setEmail(currentCell.getStringCellValue());
                             break;
-
                         case 2:
                             List<Role> roleList = new ArrayList<>();
                             String[] roleInput = currentCell.getStringCellValue().split(";");
@@ -85,15 +106,20 @@ public class AccountExcelHelper {
                             break;
 
                         case 3:
+                            accountDataDTO.setPassword(currentCell.getStringCellValue());
+                            break;
+
+                        case 4:
                             userDTO.setFullName(currentCell.getStringCellValue());
                             break;
-                        case 4:
+                        case 5:
                             userDTO.setAddress(currentCell.getStringCellValue());
                             break;
-                        case 5:
-                            userDTO.setBirthDay(LocalDate.parse(currentCell.getStringCellValue()));
-                            break;
                         case 6:
+                            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                            userDTO.setBirthDay(LocalDate.parse(currentCell.getStringCellValue(), dateFormat));
+                            break;
+                        case 7:
                             userDTO.setPhone(currentCell.getStringCellValue());
                             break;
                         default:
