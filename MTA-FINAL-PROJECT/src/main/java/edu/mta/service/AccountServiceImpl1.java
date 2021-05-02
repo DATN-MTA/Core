@@ -194,9 +194,10 @@ public class AccountServiceImpl1 implements AccountService {
 
     @Override
     public boolean updateUserInfo(UserDataResponseDTO userDataDTO) {
-        User user = userRepository.findById(userDataDTO.getId()).get();
-        if (userRepository.existsById(userDataDTO.getId()) && userDataDTO.getAccountId() == user.getAccount().getId()) {
-            userRepository.save(modelMapper.map(userDataDTO, User.class));
+        Account account = accountRepository.findByUserId(userDataDTO.getId());
+        if (account != null) {
+            account.setUser(modelMapper.map(userDataDTO, User.class));
+            accountRepository.save(account);
             return true;
         } else {
             throw new CustomException("User not found", HttpStatus.UNPROCESSABLE_ENTITY);

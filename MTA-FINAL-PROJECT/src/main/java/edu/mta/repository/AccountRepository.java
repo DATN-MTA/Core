@@ -21,6 +21,9 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	Page<Account> findByUsernameContainingOrEmailContaining(@Param("usernameOrEmail") String emailOrUserName, Pageable pageable);
 
 	boolean existsByUsername(String username);
+
+	@Query("SELECT u FROM Account u WHERE u.user.id = :userId")
+	Account findByUserId(@Param("userId") Integer userId);
 	
 	Optional<Account> findByEmailAndPassword(String email, String password);
 	
