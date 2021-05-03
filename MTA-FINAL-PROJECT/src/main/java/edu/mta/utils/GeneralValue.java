@@ -15,7 +15,7 @@ public class GeneralValue {
 	
 	public static final int semestersInYear = 3;
 	public static final int sequenceOfSummerSemester = 3;
-	public static final int lengthOfNormalSemester = 150;		//unit: day
+	public static final int lengthOfNormalSemester = 180;		//unit: day
 	public static final int lengthOfSummerSemester = 30;		//unit: day
 	
 	public static final int minStudents = 15;			//unit: person

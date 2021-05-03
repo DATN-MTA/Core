@@ -1,13 +1,15 @@
 package edu.mta.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.mta.model.StudentClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -38,5 +40,5 @@ public interface StudentClassRepository extends JpaRepository<StudentClass, Inte
 	List<StudentClass> findByStudentIDAndStatus(int studentID, int isLearning);
 
 	@Query("SELECT sc FROM StudentClass sc WHERE sc.classInstance.id = ?1 and sc.isLearning = ?2")
-	List<StudentClass> findByClassIDAndStatus(int classId, int isLearning);
+	Page<StudentClass> findByClassIDAndStatus(int classId, int isLearning, Pageable pageable);
 }

@@ -11,6 +11,8 @@ import edu.mta.utils.GeneralValue;
 import edu.mta.utils.ValidationAccountData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -187,7 +189,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	public boolean checkStudentIsLearning(int studentID, int classID) {
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentIDAndClassIDAndStatus(studentID,
 				classID, IsLearning.LEARNING.getValue());
-		if (studentClass == null) {
+		if (!studentClass.isPresent()) {
 			return false;
 		}
 
@@ -514,8 +516,8 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	}
 
 	@Override
-	public List<StudentClass> findStudentByClassId(int classId) {
-		return studentClassRepository.findByClassIDAndStatus(classId, 1);
+	public Page<StudentClass> findStudentByClassId(int classId, Pageable pageable) {
+		return studentClassRepository.findByClassIDAndStatus(classId, 1, pageable);
 	}
 
 }

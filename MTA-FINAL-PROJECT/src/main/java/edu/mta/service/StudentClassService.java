@@ -1,13 +1,15 @@
 package edu.mta.service;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
 import edu.mta.model.Account;
 import edu.mta.model.ClassRoom;
 import edu.mta.model.ReportError;
 import edu.mta.model.StudentClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 /**
  * @author BePro
@@ -72,7 +74,7 @@ public interface StudentClassService {
 	/**
 	 * Filter all emails which is invalid; 
 	 * list of invalid rows is stored in the last element of return list
-	 * @param listStudentEmail
+	 * @param listStudentRollcall
 	 * @param classID
 	 * @return
 	 */
@@ -80,6 +82,6 @@ public interface StudentClassService {
 
 	String rollcallByEmailAndClassID(ReportError studentRollcall, int classID, int roomID);
 
-	List<StudentClass> findStudentByClassId (int ClassId);
+	Page<StudentClass> findStudentByClassId (int ClassId, Pageable pageable);
 
 }

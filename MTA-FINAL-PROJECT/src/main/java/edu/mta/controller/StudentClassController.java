@@ -1,10 +1,8 @@
 package edu.mta.controller;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.dto.StudentClassDTO;
 import edu.mta.enumData.IsLearning;
 import edu.mta.model.Account;
 import edu.mta.model.Class;
@@ -13,21 +11,29 @@ import edu.mta.model.StudentClass;
 import edu.mta.service.AccountService;
 import edu.mta.service.ClassService;
 import edu.mta.service.RoomService;
+import edu.mta.service.StudentClassService;
 import edu.mta.utils.FrequentlyUtils;
+import edu.mta.utils.ValidationAccountData;
 import edu.mta.utils.ValidationRoomData;
+import edu.mta.utils.ValidationStudentClassData;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.service.StudentClassService;
-import edu.mta.utils.ValidationAccountData;
-import edu.mta.utils.ValidationStudentClassData;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -336,14 +342,44 @@ public class StudentClassController {
 	}
 
 	@GetMapping(value = "/getStudentByClass")
-	public ResponseEntity<?> getStudentInClass(
-			@RequestParam(value = "classID", required = true) int classID) {
-		List <StudentClass> studentClass = studentClassService.findStudentByClassId(classID);
-		List<Account> students = new ArrayList<>();
-		for (StudentClass studentClassTemp: studentClass) {
-			students.add(studentClassTemp.getAccount());
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 400, message = "Something went wrong"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> getStudentInClass(@RequestParam(required = false) Integer page,
+											   @RequestParam(required = false) Integer pageSize,
+			                                    @RequestParam(value = "classID", required = true) int classID) {
+
+		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
+		Page<StudentClass> studentClassPage = this.studentClassService.findStudentByClassId(classID, pageRequest != null ? pageRequest : null);
+		List<StudentClass> studentClassList = studentClassPage.getContent();
+		List<StudentClassDTO> studentClassDTOList = new ArrayList<>();
+		for (StudentClass studentClass : studentClassList) {
+			StudentClassDTO studentClassDTO = new StudentClassDTO();
+			studentClassDTO.setFullName(studentClass.getAccount().getUser().getFullName());
+			studentClassDTO.setCourseName(studentClass.getClassInstance().getCourse().getCourseName());
+			studentClassDTO.setClassName(studentClass.getClassInstance().getClassName());
+			studentClassDTO.setEmail(studentClass.getAccount().getEmail());
+			studentClassDTO.setImei(studentClass.getAccount().getUser().getImei());
+			studentClassDTO.setStatusLearning(studentClass.getIsLearning());
+
+			studentClassDTOList.add(studentClassDTO);
 		}
-		return ResponseEntity.ok(students);
+
+		if (!studentClassPage.hasContent()) {
+			return ResponseEntity.badRequest().body("No data founded!");
+		} else {
+			Map<String, Object> response = new HashMap<>();
+			if (!studentClassPage.isEmpty()) {
+				response.put("data", studentClassDTOList);
+				response.put("totalPages", studentClassPage.getTotalPages());
+				response.put("totalItems", studentClassPage.getTotalElements());
+				response.put("currentPage", studentClassPage.getNumber());
+				return ResponseEntity.ok(response);
+			}
+		}
+		return null;
     }
 	
 //	@PostMapping(value = "/rollcallStudentByEmail")
