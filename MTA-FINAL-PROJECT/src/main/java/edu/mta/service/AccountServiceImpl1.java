@@ -208,7 +208,9 @@ public class AccountServiceImpl1 implements AccountService {
     public boolean updateUserInfo(UserDataResponseDTO userDataDTO) {
         Account account = accountRepository.findByUserId(userDataDTO.getId());
         if (account != null) {
-            account.setUser(modelMapper.map(userDataDTO, User.class));
+            User user = modelMapper.map(userDataDTO, User.class);
+            account.setUser(user);
+            user.setAccount(account);
             accountRepository.save(account);
             return true;
         } else {

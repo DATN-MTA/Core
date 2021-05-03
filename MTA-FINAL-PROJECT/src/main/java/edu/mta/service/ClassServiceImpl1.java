@@ -1,19 +1,18 @@
 package edu.mta.service;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
+import edu.mta.model.Class;
+import edu.mta.model.Semester;
+import edu.mta.repository.ClassRepository;
+import edu.mta.repository.SemesterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import edu.mta.model.Class;
-import edu.mta.model.Semester;
-import edu.mta.repository.ClassRepository;
-import edu.mta.repository.SemesterRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Qualifier("ClassServiceImpl1")
@@ -82,7 +81,7 @@ public class ClassServiceImpl1 implements ClassService {
 	@Override
 	public Class findClassByClassName(String className) {
 		Optional<Class> classInstance = this.classRepository.findByClassName(className);
-		if (classInstance == null) {
+		if (!classInstance.isPresent()) {
 			return null;
 		}
 		return classInstance.get();
