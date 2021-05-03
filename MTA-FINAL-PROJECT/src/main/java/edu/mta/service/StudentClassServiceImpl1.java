@@ -79,7 +79,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentIDAndClassIDAndStatus(studentID,
 				classID, IsLearning.LEARNING.getValue());
 
-		if (studentClass == null) {
+		if (!studentClass.isPresent()) {
 			System.out.println("\n\nMile 1");
 			return "Mile1";
 		}
@@ -223,7 +223,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	public boolean checkStudentIsLearning(String studentEmail, int classID) {
 		Optional<StudentClass> studentClass = this.studentClassRepository
 				.findByStudentEmailAndClassIDAndStatus(studentEmail, classID, IsLearning.LEARNING.getValue());
-		if (studentClass == null) {
+		if (!studentClass.isPresent()) {
 			return false;
 		}
 
@@ -377,6 +377,9 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		if (account == null) {
 			return "This account is not existed";
 		}
+		if (!account.getRoles().contains(Role.ROLE_STUDENT)) {
+			return "Account added have to be student";
+		}
 
 		Class classInstance = this.classService.findClassByID(classID);
 		if (classInstance == null) {
@@ -470,7 +473,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 
 		Optional<StudentClass> studentClass = this.studentClassRepository.findByStudentEmailAndClassIDAndStatus(
 				studentRollcall.getDescription(), classID, IsLearning.LEARNING.getValue());
-		if (studentClass == null) {
+		if (!studentClass.isPresent()) {
 			return "Not found student-class";
 		}
 
@@ -481,7 +484,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 		LocalTime checkTime = rollcallAt.toLocalTime();
 		Optional<ClassRoom> classRoomOpt = this.classRoomRepository.findByClassIDAndRoomIDAndWeekday(classID, roomID,
 				weekday, checkTime);
-		if (classRoomOpt == null) {
+		if (!classRoomOpt.isPresent()) {
 			return "Not in lesson's duration!";
 		}
 

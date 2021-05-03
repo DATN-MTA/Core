@@ -1,18 +1,17 @@
 
 package edu.mta.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import edu.mta.model.Room;
 import edu.mta.repository.RoomRepository;
+import edu.mta.utils.GeneralValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import edu.mta.model.Room;
-import edu.mta.utils.GeneralValue;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Qualifier("RoomServiceImpl1")
@@ -62,7 +61,7 @@ public class RoomServiceImpl1 implements RoomService {
 	@Override
 	public double calculateDistanceBetween2GPSCoord(int roomID, double gpsLong, double gpsLa) {
 		Optional<Room> room = this.roomRepository.findById(roomID);
-		if (room == null) {
+		if (!room.isPresent()) {
 			return Integer.MAX_VALUE;
 		}
 

@@ -84,7 +84,7 @@ public class AccountServiceImpl1 implements AccountService {
     @Override
     public Account findAccountByID(int id) {
         Optional<Account> account = this.accountRepository.findById(id);
-        if (account == null) {
+        if (!account.isPresent()) {
             return null;
         }
 
@@ -168,7 +168,7 @@ public class AccountServiceImpl1 implements AccountService {
     @Override
     public Account findAccountByEmail(String email) {
         Optional<Account> account = this.accountRepository.findByEmail(email);
-        if (account == null) {
+        if (!account.isPresent()) {
             return null;
         }
         return account.get();

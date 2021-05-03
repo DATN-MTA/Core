@@ -1,5 +1,22 @@
 package edu.mta.service;
 
+import edu.mta.enumData.IsLearning;
+import edu.mta.enumData.IsTeaching;
+import edu.mta.enumData.SpecialRollCall;
+import edu.mta.model.Class;
+import edu.mta.model.*;
+import edu.mta.repository.ClassRepository;
+import edu.mta.repository.ClassRoomRepository;
+import edu.mta.repository.StudentClassRepository;
+import edu.mta.repository.TeacherClassRepository;
+import edu.mta.utils.FrequentlyUtils;
+import edu.mta.utils.GeneralValue;
+import edu.mta.utils.ValidationAccountData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -9,28 +26,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import edu.mta.enumData.IsLearning;
-import edu.mta.enumData.IsTeaching;
-import edu.mta.enumData.SpecialRollCall;
-import edu.mta.model.Class;
-import edu.mta.repository.StudentClassRepository;
-import edu.mta.repository.TeacherClassRepository;
-import edu.mta.utils.FrequentlyUtils;
-import edu.mta.utils.GeneralValue;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import edu.mta.model.Account;
-import edu.mta.model.ClassRoom;
-import edu.mta.model.StudentClass;
-import edu.mta.model.TeacherClass;
-import edu.mta.repository.ClassRepository;
-import edu.mta.repository.ClassRoomRepository;
-import edu.mta.utils.ValidationAccountData;
 
 @Service
 @Transactional
@@ -94,7 +89,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<TeacherClass> teacherClass = this.teacherClassRepository.findByTeacherIDAndClassIDAndStatus(teacherID,
 				classID, IsTeaching.TEACHING.getValue());
 
-		if (teacherClass == null) {
+		if (!teacherClass.isPresent()) {
 			return false;
 		}
 
@@ -206,7 +201,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		String newValue = null;
 		String listRollCall = null;
 
-		if (teacherClass == null) {
+		if (!teacherClass.isPresent()) {
 			return false;
 		}
 
@@ -245,10 +240,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 	public TeacherClass findCurrentTeacherByClassID(int classID) {
 		Optional<TeacherClass> teacherClass = this.teacherClassRepository.findByClassIDAndStatus(classID,
 				IsTeaching.TEACHING.getValue());
-		if (teacherClass == null) {
-			return null;
-		}
-		return teacherClass.get();
+		return teacherClass.isPresent()?teacherClass.get():null;
 	}
 
 	@Override
@@ -270,7 +262,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<StudentClass> studentClass = this.studentClassRepository
 				.findByStudentEmailAndClassIDAndStatus(studentEmail, classID, IsLearning.LEARNING.getValue());
 
-		if (classRoom == null || studentClass == null) {
+		if (!classRoom.isPresent() || !studentClass.isPresent()) {
 			return false;
 		}
 
@@ -506,7 +498,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		Optional<TeacherClass> teacherClassOpt = this.teacherClassRepository.findByClassIDAndStatus(classID,
 				IsTeaching.TEACHING.getValue());
 
-		if (teacherClassOpt == null) {
+		if (!teacherClassOpt.isPresent()) {
 			return false;
 		}
 

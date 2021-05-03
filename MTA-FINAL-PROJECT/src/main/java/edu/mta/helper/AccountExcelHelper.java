@@ -97,16 +97,15 @@ public class AccountExcelHelper {
                             accountDataDTO.setEmail(currentCell.getStringCellValue());
                             break;
                         case 2:
+                            accountDataDTO.setPassword(currentCell.getStringCellValue());
+                            break;
+                        case 3:
                             List<Role> roleList = new ArrayList<>();
                             String[] roleInput = currentCell.getStringCellValue().split(";");
                             for (String role : roleInput) {
                                 roleList.add(modelMapper.map(role, Role.class));
                             }
                             accountDataDTO.setRoles(roleList);
-                            break;
-
-                        case 3:
-                            accountDataDTO.setPassword(currentCell.getStringCellValue());
                             break;
 
                         case 4:
