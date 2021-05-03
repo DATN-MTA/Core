@@ -10,18 +10,11 @@ import edu.mta.service.ErrorCodeService;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/errors")
@@ -38,10 +31,11 @@ public class ErrorCodeController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
 
-        @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 403, message = "Access denied"), //
-        @ApiResponse(code = 404, message = "The user doesn't exist"), //
-        @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+            @ApiResponse(code = 204, message = "No data founded"), //
+            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 404, message = "The user doesn't exist"), //
+            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public void createOrUpdate(@RequestBody ErrorCode errorCode) {
         errorCodeService.save(errorCode);
     }
@@ -50,10 +44,11 @@ public class ErrorCodeController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
 
-        @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 403, message = "Access denied"), //
-        @ApiResponse(code = 404, message = "The user doesn't exist"), //
-        @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+            @ApiResponse(code = 204, message = "No data founded"), //
+            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 404, message = "The user doesn't exist"), //
+            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
 
     public void delete(@ApiParam("errorCodeId") @PathVariable Long id) {
         errorCodeService.delete(id);
