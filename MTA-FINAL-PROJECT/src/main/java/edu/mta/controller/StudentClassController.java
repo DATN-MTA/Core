@@ -368,7 +368,7 @@ public class StudentClassController {
 		}
 
 		if (!studentClassPage.hasContent()) {
-			return ResponseEntity.badRequest().body("No data founded!");
+			return ResponseEntity.ok("No data founded!");
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (!studentClassPage.isEmpty()) {
@@ -381,39 +381,5 @@ public class StudentClassController {
 		}
 		return null;
     }
-	
-//	@PostMapping(value = "/rollcallStudentByEmail")
-//	public ResponseEntity<?> rollcallStudentByEmail(@RequestParam(value = "classID", required = true) int classID,
-//			@RequestBody String studentEmail) {
-//
-//		ObjectMapper objectMapper = null;
-//		ReportError report;
-//		int invalidAccount = 0;
-//
-//		try {
-//			objectMapper = new ObjectMapper();
-//
-//			List<String> filteredList = this.studentClassService
-//											.checkListRollcallEmail(listStudentEmail, classID);
-//
-//			if (filteredList == null || filteredList.isEmpty()) {
-//				report = new ReportError(200, "All accounts are invalid!");
-//			} else {
-//				for (int i = 0; i < filteredList.size() - 1; i++) {
-//					this.studentClassService.rollcallByEmailAndClassID(filteredList.get(i), classID);
-//				}
-//
-//				report = new ReportError(200, filteredList.get(filteredList.size() - 1));
-//			}
-//			
-//			System.out.println("report body = " + report.getDescription());
-//			return ResponseEntity.ok(report);
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			report = new ReportError(2, "Error happened when jackson deserialization info!");
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
-//		}
-//	}
 	
 }

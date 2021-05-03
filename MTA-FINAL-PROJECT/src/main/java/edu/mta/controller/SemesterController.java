@@ -1,16 +1,13 @@
 package edu.mta.controller;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import edu.mta.model.Course;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.model.ReportError;
 import edu.mta.model.Semester;
 import edu.mta.service.SemesterService;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationData;
+import edu.mta.utils.ValidationSemesterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -18,18 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.utils.ValidationSemesterData;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -155,7 +146,7 @@ public class SemesterController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Semester> pageSemesters = this.semesterService.findAllSemester(pageRequest);
 		if (pageSemesters == null) {
-			return ResponseEntity.badRequest().body("No data founded!");
+			return ResponseEntity.ok().body("No data founded!");
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (pageSemesters != null) {

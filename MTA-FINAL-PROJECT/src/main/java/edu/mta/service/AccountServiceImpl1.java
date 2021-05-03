@@ -116,15 +116,19 @@ public class AccountServiceImpl1 implements AccountService {
 
     public String signup(AccountDataDTO accountDataDTO) {
         if (!accountRepository.existsByUsername(accountDataDTO.getUsername())) {
-            Account account = accountDTOMapper.createFrom(accountDataDTO);
+            try {
+                Account account = accountDTOMapper.createFrom(accountDataDTO);
 //            String password = PasswordUtil.randomPassword();
-            account.setPassword(passwordEncoder.encode(accountDataDTO.getPassword()));
-            account.setIsActive(1);
-            User user = modelMapper.map(accountDataDTO.getUser(), User.class);
-            user.setAccount(account);
-            account.setUser(user);
-            accountRepository.save(account);
-            return jwtTokenProvider.createToken(account.getUsername(), account.getRoles());
+                account.setPassword(passwordEncoder.encode(accountDataDTO.getPassword()));
+                account.setIsActive(1);
+                User user = modelMapper.map(accountDataDTO.getUser(), User.class);
+                user.setAccount(account);
+                account.setUser(user);
+                accountRepository.save(account);
+                return jwtTokenProvider.createToken(account.getUsername(), account.getRoles());
+            } catch (Exception ex) {
+                throw new CustomException(ex.getMessage(), HttpStatus.BAD_REQUEST);
+            }
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -142,10 +146,14 @@ public class AccountServiceImpl1 implements AccountService {
 
     @Override
     public boolean activeOrDeactivateAccount(List<Integer> acountIds, Integer status) {
-        for (Integer accountId : acountIds) {
-            Account account = accountRepository.getOne(accountId);
-            account.setIsActive(status);
-            accountRepository.save(account);
+        try {
+            for (Integer accountId : acountIds) {
+                Account account = accountRepository.getOne(accountId);
+                account.setIsActive(status);
+                accountRepository.save(account);
+            }
+        } catch (Exception ex) {
+            throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return true;
     }

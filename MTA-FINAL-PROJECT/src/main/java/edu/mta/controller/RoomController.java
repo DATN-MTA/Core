@@ -1,12 +1,12 @@
 
 package edu.mta.controller;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import edu.mta.model.Course;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.model.ReportError;
+import edu.mta.model.Room;
+import edu.mta.service.RoomService;
+import edu.mta.utils.ValidationData;
+import edu.mta.utils.ValidationRoomData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -14,21 +14,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.mta.model.ReportError;
-import edu.mta.model.Room;
-import edu.mta.service.RoomService;
-import edu.mta.utils.ValidationData;
-import edu.mta.utils.ValidationRoomData;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -142,7 +133,7 @@ public class RoomController {
 		Page<Room> pageRooms = this.roomService.findAllRooms(pageRequest != null ? pageRequest : null);
 
 		if (pageRooms == null) {
-			return ResponseEntity.badRequest().body("No data founded!");
+			return ResponseEntity.ok("No data founded!");
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (pageRooms != null) {

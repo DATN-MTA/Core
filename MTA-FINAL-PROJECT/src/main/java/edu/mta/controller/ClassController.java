@@ -1,11 +1,7 @@
 package edu.mta.controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.ClassDTO;
 import edu.mta.model.Class;
 import edu.mta.model.Course;
@@ -25,19 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -332,7 +323,7 @@ public class ClassController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Class> pageClasses = this.classService.getAllClasses(pageRequest != null ? pageRequest : null);
 		if (pageClasses == null) {
-			return ResponseEntity.badRequest().body("No data founded!");
+			return ResponseEntity.ok("No data founded!");
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<Class> listClass = pageClasses.getContent();
@@ -366,8 +357,8 @@ public class ClassController {
 										                   @RequestParam(required = false) Integer pageSize) {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Class> pageClasses = this.classService.getClassesBySemesterAndCourse(pageRequest, semesterId, courseId);
-		if (pageClasses == null) {
-			return ResponseEntity.badRequest().body("No data founded!");
+		if (!pageClasses.hasContent()) {
+			return ResponseEntity.ok("No data founded!");
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<Class> listClass = pageClasses.getContent();
