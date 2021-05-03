@@ -12,7 +12,7 @@ public class ClassRoomRequestDTO {
     @Valid
     private Integer id;
 
-    @ApiModelProperty(position = 1, required = true, example = "00:00:00")
+    @ApiModelProperty(position = 1, required = true, example = "06::00")
     @Valid
     private String beginAt;
 

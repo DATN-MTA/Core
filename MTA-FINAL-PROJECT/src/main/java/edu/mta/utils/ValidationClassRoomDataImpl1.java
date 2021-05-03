@@ -52,7 +52,8 @@ public class ValidationClassRoomDataImpl1 implements ValidationClassRoomData {
 		}
 
 		if (flag == false) {
-			return "FinishAt value is not in valid list!";
+			return "FinishAt value is not in valid list!" + "Morning: " + MorningTimeFrame.values() +
+			" Afternoon: " + AfternoonTimeFrame.values() + " 45m";
 		}
 
 		return null;
@@ -87,8 +88,8 @@ public class ValidationClassRoomDataImpl1 implements ValidationClassRoomData {
 		}
 
 		if (flag == false) {
-			return "BeginAt value is not in valid list! Morning FRAME1(\"06:45:00\"), FRAME2(\"07:35:00\"), FRAME3(\"08:20:00\"), FRAME4(\"09:20:00\"), FRAME5(\"10:15:00\"), FRAME6(\"11:05:00\"); \n " +
-					" Afternoon: FRAME7(\"12:30:00\"), FRAME8(\"13:20:00\"), FRAME9(\"14:15:00\"), FRAME10(\"15:05:00\"), FRAME11(\"16:00:00\"), FRAME12(\"16:50:00\"); ";
+			return "BeginAt value is not in valid list! " + "Morning: " + MorningTimeFrame.values() +
+					" Afternoon: " + AfternoonTimeFrame.values();
 
 		}
 		return null;
