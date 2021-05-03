@@ -364,7 +364,7 @@ public class StudentClassController {
             try {
                 InputStreamResource fileResult = new InputStreamResource(studentClassExcelService.save(file, classId));
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "student_class_import_result")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "student_class_import_result.xlsx")
                         .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                         .body(fileResult);
             } catch (Exception e) {
