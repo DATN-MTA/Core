@@ -205,8 +205,15 @@ public class ClassRoomController {
 		return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
 	}
 
-	@PutMapping("/classrooms")
-	public ResponseEntity<?> updateInfoClassRoom(@RequestBody String infoClassRoom) {
+	@PutMapping("/updateExistedClassroom")
+	@ApiOperation(value = "Update single class to room")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 204, message = "No data founded"), //
+			@ApiResponse(code = 400, message = "Invalidate data request"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> updateInfoClassRoom(@RequestBody  ClassRoomRequestDTO classRoomRequestDTO) {
 		Map<String, Object> jsonMap = null;
 		ObjectMapper objectMapper = null;
 		String errorMessage = null;
@@ -223,7 +230,7 @@ public class ClassRoomController {
 
 		try {
 			objectMapper = new ObjectMapper();
-			jsonMap = objectMapper.readValue(infoClassRoom, new TypeReference<Map<String, Object>>() {
+			jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(classRoomRequestDTO), new TypeReference<Map<String, Object>>() {
 			});
 
 			// check request body has enough info in right JSON format
