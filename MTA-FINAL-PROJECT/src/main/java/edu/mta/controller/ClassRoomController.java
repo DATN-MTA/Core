@@ -28,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class ClassRoomController {
 			@ApiResponse(code = 400, message = "Invalidate data request"), //
 			@ApiResponse(code = 403, message = "Access denied"), //
 			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-	public ResponseEntity<?> addNewClassRoom(@RequestBody ClassRoomRequestDTO classRoomRequestDTO) {
+	public ResponseEntity<?> addNewClassRoom(@Valid @RequestBody ClassRoomRequestDTO classRoomRequestDTO) {
 		Map<String, Object> jsonMap = null;
 		ObjectMapper objectMapper = null;
 		String errorMessage;

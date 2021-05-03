@@ -2,24 +2,35 @@ package edu.mta.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Valid
 public class ClassRoomRequestDTO {
 
     @ApiModelProperty(position = 0, required = true, example = "null value for create")
+    @Valid
     private Integer id;
 
     @ApiModelProperty(position = 1, required = true, example = "00:00:00")
+    @Valid
     private String beginAt;
 
     @ApiModelProperty(position = 2, required = true, example = "00:00:00")
+    @Valid
+    @NotNull(message = "finishAt can't be NULL")
     private String finishAt;
 
     @ApiModelProperty(position = 3, required = true, example = "2")
+    @Valid
     private Integer weekday;
 
     @ApiModelProperty(position = 4, required = true)
+    @Valid
     private Integer classID;
 
     @ApiModelProperty(position = 5, required = true)
+    @Valid
     private Integer roomID;
 
     public ClassRoomRequestDTO(Integer id, String beginAt, String finishAt, Integer weekday, Integer classID, Integer roomID) {
