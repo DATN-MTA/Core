@@ -420,7 +420,7 @@ public class ClassRoomController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<ClassRoom> pageClasses = this.classRoomService.getClassRoomBySemesterAndCourseAndClass(null, null, null, pageRequest);
 		if (!pageClasses.hasContent()) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<ClassRoom> listClass = pageClasses.getContent();
@@ -457,7 +457,7 @@ public class ClassRoomController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<ClassRoom> pageClasses = this.classRoomService.getClassRoomBySemesterAndCourseAndClass(courseId, classId, roomId, pageRequest);
 		if (!pageClasses.hasContent()) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<ClassRoom> listClass = pageClasses.getContent();

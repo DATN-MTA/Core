@@ -142,7 +142,7 @@ public class AccountController {
 			accountResponseDTOList.add(accountResponseDTO);
 		}
 		if (pageAccounts == null) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (!pageAccounts.isEmpty()) {

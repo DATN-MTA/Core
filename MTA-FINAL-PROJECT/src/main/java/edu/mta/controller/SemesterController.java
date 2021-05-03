@@ -146,7 +146,7 @@ public class SemesterController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Semester> pageSemesters = this.semesterService.findAllSemester(pageRequest);
 		if (pageSemesters == null) {
-			return ResponseEntity.ok().body("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (pageSemesters != null) {

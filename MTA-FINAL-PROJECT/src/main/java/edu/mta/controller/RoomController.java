@@ -133,7 +133,7 @@ public class RoomController {
 		Page<Room> pageRooms = this.roomService.findAllRooms(pageRequest != null ? pageRequest : null);
 
 		if (pageRooms == null) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			if (pageRooms != null) {

@@ -3,6 +3,7 @@ package edu.mta.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.ClassDTO;
+import edu.mta.exception.CustomException;
 import edu.mta.model.Class;
 import edu.mta.model.Course;
 import edu.mta.model.ReportError;
@@ -323,7 +324,7 @@ public class ClassController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Class> pageClasses = this.classService.getAllClasses(pageRequest != null ? pageRequest : null);
 		if (pageClasses == null) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<Class> listClass = pageClasses.getContent();
@@ -358,7 +359,7 @@ public class ClassController {
 		Pageable pageRequest = PageRequest.of(page != null ? page : 0, pageSize != null ? pageSize : 5);
 		Page<Class> pageClasses = this.classService.getClassesBySemesterAndCourse(pageRequest, semesterId, courseId);
 		if (!pageClasses.hasContent()) {
-			return ResponseEntity.ok("No data founded!");
+			throw new CustomException("Not found data", HttpStatus.NO_CONTENT);
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<Class> listClass = pageClasses.getContent();
