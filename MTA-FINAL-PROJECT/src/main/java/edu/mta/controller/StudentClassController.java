@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.StudentClassDTO;
 import edu.mta.enumData.IsLearning;
+import edu.mta.exception.CustomException;
 import edu.mta.model.Account;
 import edu.mta.model.Class;
 import edu.mta.model.ReportError;

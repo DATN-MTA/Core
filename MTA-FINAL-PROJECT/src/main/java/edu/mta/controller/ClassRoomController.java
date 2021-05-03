@@ -4,6 +4,7 @@ package edu.mta.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.ClassRoomDTO;
+import edu.mta.exception.CustomException;
 import edu.mta.model.Class;
 import edu.mta.model.ClassRoom;
 import edu.mta.model.ReportError;

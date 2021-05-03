@@ -2,6 +2,7 @@
 package edu.mta.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.exception.CustomException;
 import edu.mta.model.ReportError;
 import edu.mta.model.Room;
 import edu.mta.service.RoomService;
