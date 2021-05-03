@@ -80,7 +80,7 @@ public class AccountController {
     @PostMapping("/signin")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 422, message = "Invalid username/password supplied or account has been deactivated")})
     public String login(//
                         @ApiParam("Username") @RequestParam String username, //
@@ -92,7 +92,7 @@ public class AccountController {
     @ApiOperation(value = "${UserController.signup}")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 422, message = "Username is already in use")})
     public String signup(@ApiParam("Signup User") @RequestBody AccountDataDTO accountDataDTO) {
@@ -103,7 +103,7 @@ public class AccountController {
     @ApiOperation(value = "${UserController.me}", response = AccountResponseDTO.class, authorizations = {@Authorization(value = "apiKey")})
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public AccountResponseDTO whoami(HttpServletRequest req) {
@@ -117,7 +117,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public AccountResponseDTO getUserInfo(@RequestParam(value = "accountId", required = true) Integer accountId) {
@@ -131,7 +131,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> getAllAccount(@RequestParam(required = false) Integer page,
@@ -165,7 +165,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> disableAccount(@RequestBody List<Integer> accountIds) {
@@ -176,7 +176,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> activeOrInactiveSingleAccount(@RequestBody Integer accountId) {
@@ -187,7 +187,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> activateAccount(@RequestBody List<Integer> accountIds) {
@@ -197,7 +197,7 @@ public class AccountController {
     @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public boolean updatePassword(@RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest req) {
@@ -214,7 +214,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public boolean forceUpdatePassword(@RequestParam(required = true) String email, @Context HttpServletRequest req) {
@@ -248,7 +248,7 @@ public class AccountController {
     @RequestMapping(value = "/updateUserInfo", method = RequestMethod.PUT)
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> updateUserInfo(@RequestBody UserDataResponseDTO userDataDTO) {
@@ -263,7 +263,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -289,7 +289,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Resource> getFile() {

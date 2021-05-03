@@ -3,7 +3,8 @@ package edu.mta.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mta.dto.ClassRoomDTO;
+import edu.mta.dto.ClassRoomRequestDTO;
+import edu.mta.dto.ClassRoomResponseDTO;
 import edu.mta.exception.CustomException;
 import edu.mta.model.Class;
 import edu.mta.model.ClassRoom;
@@ -13,6 +14,9 @@ import edu.mta.service.*;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationClassRoomData;
 import edu.mta.utils.ValidationData;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -20,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -68,12 +73,19 @@ public class ClassRoomController {
 		this.teacherClassService = teacherClassService;
 	}
 
-	@PostMapping("/classrooms")
-	public ResponseEntity<?> addNewClassRoom(@RequestBody String infoClassRoom) {
+	@PostMapping("/assignClassToRoom")
+	@ApiOperation(value = "Assign single class to room")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ApiResponses(value = {//
+			@ApiResponse(code = 204, message = "No data founded"), //
+			@ApiResponse(code = 400, message = "Invalidate data request"), //
+			@ApiResponse(code = 403, message = "Access denied"), //
+			@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	public ResponseEntity<?> addNewClassRoom(@RequestBody ClassRoomRequestDTO classRoomRequestDTO) {
 		Map<String, Object> jsonMap = null;
 		ObjectMapper objectMapper = null;
-		String errorMessage = null;
-		Class classInstance = null;
+		String errorMessage;
+		Class classInstance;
 		Room room = null;
 		LocalTime beginAt = null;
 		LocalTime finishAt = null;
@@ -85,7 +97,7 @@ public class ClassRoomController {
 
 		try {
 			objectMapper = new ObjectMapper();
-			jsonMap = objectMapper.readValue(infoClassRoom, new TypeReference<Map<String, Object>>() {
+			jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(classRoomRequestDTO), new TypeReference<Map<String, Object>>() {
 			});
 
 			// check request body has enough info in right JSON format
@@ -358,19 +370,13 @@ public class ClassRoomController {
 	
 	
 	@PostMapping("/createMultipleClassRoom")
-	public ResponseEntity<?> createMultipleClassRoom( @RequestBody String requestBody, 
+	public ResponseEntity<?> createMultipleClassRoom( @RequestBody List<ClassRoom> listClassRoom,
 			@RequestParam(value = "roomID", required = true) int roomID) {
 
-		String errorMessage = null;
-		ReportError report = null;
-		ObjectMapper objectMapper = null;
-		List<ClassRoom> listClassRoom = null;
+		String errorMessage;
+		ReportError report;
 		
 		try {
-			objectMapper = new ObjectMapper();
-			objectMapper.findAndRegisterModules();
-			listClassRoom = objectMapper.readValue(requestBody, new TypeReference<List<ClassRoom>>() {
-			});
 
 			//System.out.println(listClassRoom.get(0).getBeginAt());
 			//System.out.println(listClassRoom.get(0).getFinishAt());
@@ -425,9 +431,9 @@ public class ClassRoomController {
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<ClassRoom> listClass = pageClasses.getContent();
-			List<ClassRoomDTO> listClassRoomDTO = new ArrayList<>();
+			List<ClassRoomResponseDTO> listClassRoomDTO = new ArrayList<>();
 			for (ClassRoom classRoomToConvert: listClass) {
-				ClassRoomDTO classRoomDTO = new ClassRoomDTO();
+				ClassRoomResponseDTO classRoomDTO = new ClassRoomResponseDTO();
 				classRoomDTO.setClassRoomId(classRoomToConvert.getId());
 				classRoomDTO.setSemesterName(classRoomToConvert.getClassInstance().getSemester().getSemesterName());
 				classRoomDTO.setCourseName(classRoomToConvert.getClassInstance().getCourse().getCourseName());
@@ -462,9 +468,9 @@ public class ClassRoomController {
 		} else {
 			Map<String, Object> response = new HashMap<>();
 			List<ClassRoom> listClass = pageClasses.getContent();
-			List<ClassRoomDTO> listClassRoomDTO = new ArrayList<>();
+			List<ClassRoomResponseDTO> listClassRoomDTO = new ArrayList<>();
 			for (ClassRoom classRoomToConvert: listClass) {
-				ClassRoomDTO classRoomDTO = new ClassRoomDTO();
+				ClassRoomResponseDTO classRoomDTO = new ClassRoomResponseDTO();
 				classRoomDTO.setClassRoomId(classRoomToConvert.getId());
 				classRoomDTO.setSemesterName(classRoomToConvert.getClassInstance().getSemester().getSemesterName());
 				classRoomDTO.setCourseName(classRoomToConvert.getClassInstance().getCourse().getCourseName());

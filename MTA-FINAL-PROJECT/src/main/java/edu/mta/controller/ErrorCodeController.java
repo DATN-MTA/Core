@@ -32,7 +32,7 @@ public class ErrorCodeController {
     @ApiResponses(value = {//
 
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 404, message = "The user doesn't exist"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
@@ -45,7 +45,7 @@ public class ErrorCodeController {
     @ApiResponses(value = {//
 
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 404, message = "The user doesn't exist"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})

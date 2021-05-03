@@ -248,9 +248,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 
 		List<ClassRoom> listClassRoom = this.classRoomRepository.findByClassID(classID);
 		if (listClassRoom == null || listClassRoom.isEmpty()) {
-			// this class has no lesson => no conflict
-			// this situation is for special class
-			return null;
+			return "This class has not had timetable yet!";
 		}
 
 		// a week has 5 weekdays from Monday to Friday; int[0] and int[1] are not used
@@ -367,7 +365,7 @@ public class StudentClassServiceImpl1 implements StudentClassService {
 	@Override
 	public String addNewStudentClass(String studentEmail, int classID) {
 
-		String errorMessage = null;
+		String errorMessage;
 		errorMessage = this.validationAccountData.validateEmailData(studentEmail);
 		if (errorMessage != null) {
 			return errorMessage;

@@ -293,7 +293,7 @@ public class StudentClassController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> getStudentInClass(@RequestParam(required = false) Integer page,
@@ -336,7 +336,7 @@ public class StudentClassController {
     @ApiOperation(value = "Download template file template to import to add multiple students to an existing class")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Resource> getFile() {
@@ -354,7 +354,7 @@ public class StudentClassController {
     @ApiOperation(value = "Import file to add multiple students to an existing class")
     @ApiResponses(value = {//
             @ApiResponse(code = 204, message = "No data founded"), //
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Resource> uploadFile(@RequestParam("file") MultipartFile file,

@@ -2,7 +2,7 @@ package edu.mta.dto;
 
 import java.time.LocalTime;
 
-public class ClassRoomDTO {
+public class ClassRoomResponseDTO {
     private int classRoomId;
     private String semesterName;
     private String courseName;
@@ -12,10 +12,10 @@ public class ClassRoomDTO {
     private int DayOfWeek;
     private String roomName;
 
-    public ClassRoomDTO() {
+    public ClassRoomResponseDTO() {
     }
 
-    public ClassRoomDTO(String semesterName, String courseName, String className, LocalTime beginAt, LocalTime finishAt, int dayOfWeek, String roomName) {
+    public ClassRoomResponseDTO(String semesterName, String courseName, String className, LocalTime beginAt, LocalTime finishAt, int dayOfWeek, String roomName) {
         this.semesterName = semesterName;
         this.courseName = courseName;
         this.className = className;

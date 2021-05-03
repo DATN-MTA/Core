@@ -1,12 +1,11 @@
 package edu.mta.utils;
 
-import java.time.LocalTime;
-
+import edu.mta.enumData.AfternoonTimeFrame;
 import edu.mta.enumData.MorningTimeFrame;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import edu.mta.enumData.AfternoonTimeFrame;
+import java.time.LocalTime;
 
 @Component
 @Qualifier("ValidationClassRoomDataImpl1")
@@ -88,7 +87,9 @@ public class ValidationClassRoomDataImpl1 implements ValidationClassRoomData {
 		}
 
 		if (flag == false) {
-			return "BeginAt value is not in valid list!";
+			return "BeginAt value is not in valid list! Morning FRAME1(\"06:45:00\"), FRAME2(\"07:35:00\"), FRAME3(\"08:20:00\"), FRAME4(\"09:20:00\"), FRAME5(\"10:15:00\"), FRAME6(\"11:05:00\"); \n " +
+					" Afternoon: FRAME7(\"12:30:00\"), FRAME8(\"13:20:00\"), FRAME9(\"14:15:00\"), FRAME10(\"15:05:00\"), FRAME11(\"16:00:00\"), FRAME12(\"16:50:00\"); ";
+
 		}
 		return null;
 	}

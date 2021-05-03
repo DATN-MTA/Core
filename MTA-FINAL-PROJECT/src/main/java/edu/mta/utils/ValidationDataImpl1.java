@@ -1,16 +1,15 @@
 package edu.mta.utils;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
-import java.util.Map;
-
+import edu.mta.enumData.IsLearning;
+import edu.mta.enumData.IsTeaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import edu.mta.enumData.IsLearning;
-import edu.mta.enumData.IsTeaching;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 @Component
 @Qualifier("ValidationDataImpl1")
@@ -240,10 +239,10 @@ public class ValidationDataImpl1 implements ValidationData {
 		String errorMessage = null;
 		int tmpNumber = -1;
 		
-		if (mapKeys.containsKey("id")) {
-			tmpNumber = Integer.parseInt(mapKeys.get("id").toString());
-			errorMessage = this.validationClassRoomData.validateIdData(tmpNumber);
-		}
+//		if (mapKeys.containsKey("id")) {
+//			tmpNumber = Integer.parseInt(mapKeys.get("id").toString());
+//			errorMessage = this.validationClassRoomData.validateIdData(tmpNumber);
+//		}
 		
 		if (errorMessage == null && mapKeys.containsKey("classID")) {
 			tmpNumber = Integer.parseInt(mapKeys.get("classID").toString());
