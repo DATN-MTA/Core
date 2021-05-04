@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class StudentClassExcelService {
+public class StudentClassExcelService extends ExcelServiceAbstract{
     @Autowired
     private StudentClassService studentClassService;
     @Autowired
@@ -34,10 +34,5 @@ public class StudentClassExcelService {
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
-    }
-
-    public ByteArrayInputStream load() {
-        ByteArrayInputStream in = studentClassExcelHelper.generateExcel();
-        return in;
     }
 }

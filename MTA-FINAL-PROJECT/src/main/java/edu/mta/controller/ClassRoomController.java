@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.ClassRoomRequestDTO;
 import edu.mta.dto.ClassRoomResponseDTO;
 import edu.mta.exception.CustomException;
+import edu.mta.helper.AccountExcelHelper;
+import edu.mta.helper.ClassRoomExcelHelper;
 import edu.mta.model.Class;
 import edu.mta.model.ClassRoom;
 import edu.mta.model.ReportError;
 import edu.mta.model.Room;
 import edu.mta.service.*;
+import edu.mta.service.exel.ClassRoomExcelService;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.ValidationClassRoomData;
 import edu.mta.utils.ValidationData;
@@ -19,13 +22,18 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
@@ -53,6 +61,12 @@ public class ClassRoomController {
     public ClassRoomController() {
         super();
     }
+
+    @Autowired
+    private ClassRoomExcelService classRoomExcelService;
+
+    @Autowired
+    private ClassRoomExcelHelper classRoomExcelHelper;
 
     @Autowired
     public ClassRoomController(@Qualifier("ClassRoomServiceImpl1") ClassRoomService classRoomService,
@@ -83,79 +97,13 @@ public class ClassRoomController {
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<?> addNewClassRoom(@Valid @RequestBody ClassRoomRequestDTO classRoomRequestDTO) {
-        Map<String, Object> jsonMap = null;
-        ObjectMapper objectMapper = null;
-        String errorMessage;
-        Class classInstance;
-        Room room = null;
-        LocalTime beginAt = null;
-        LocalTime finishAt = null;
-        int weekday = -1;
-        int classID = -1;
-        int roomID = -1;
-        ReportError report = null;
-        ClassRoom classRoom = null;
-
-        try {
-            objectMapper = new ObjectMapper();
-            jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(classRoomRequestDTO), new TypeReference<Map<String, Object>>() {
-            });
-
-            // check request body has enough info in right JSON format
-            if (!this.frequentlyUtils.checkKeysExist(jsonMap, "beginAt", "finishAt", "weekday", "classID", "roomID")) {
-                report = new ReportError(1, "You have to fill all required information!");
-                return ResponseEntity.badRequest().body(report);
-            }
-
-            errorMessage = this.validationData.validateClassRoomData(jsonMap);
-            if (errorMessage != null) {
-                report = new ReportError(70, "Adding new class-room failed because " + errorMessage);
-                return ResponseEntity.badRequest().body(report);
-            }
-
-            // check if this class exists
-            classID = Integer.parseInt(jsonMap.get("classID").toString());
-            classInstance = this.classService.findClassByID(classID);
-            if (classInstance == null) {
-                report = new ReportError(63, "This class do not exist!");
-                return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
-            }
-
-            // check if this room exists
-            roomID = Integer.parseInt(jsonMap.get("roomID").toString());
-            room = this.roomService.findRoomById(roomID);
-            if (room == null) {
-                report = new ReportError(53, "This room do not exist!");
-                return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
-            }
-
-            beginAt = LocalTime.parse(jsonMap.get("beginAt").toString());
-            finishAt = LocalTime.parse(jsonMap.get("finishAt").toString());
-            weekday = Integer.parseInt(jsonMap.get("weekday").toString());
-
-            // check if class is available at this duration
-            if (this.classRoomService.checkClassAvailable(classID, weekday, beginAt, finishAt) != null) {
-                report = new ReportError(71, "This class is not available at this duration!");
-                return ResponseEntity.badRequest().body(report);
-            }
-
-            // check if room is available at this duration
-            if (this.classRoomService.checkRoomAvailable(roomID, weekday, beginAt, finishAt) != null) {
-                report = new ReportError(72, "This room is not available at this duration!");
-                return ResponseEntity.badRequest().body(report);
-            }
-
-            classRoom = new ClassRoom(beginAt, finishAt, weekday);
-            classRoom.setClassInstance(classInstance);
-            classRoom.setRoom(room);
-
-            this.classRoomService.addNewClassRoom(classRoom);
+        ReportError report;
+        String result = this.classRoomService.addNewClassRoom(classRoomRequestDTO);
+        if (result == null && result.isEmpty()) {
             report = new ReportError(200, "Adding new class-room suceeses!");
             return ResponseEntity.ok(report);
-        } catch (Exception e) {
-            e.printStackTrace();
-            report = new ReportError(2, "Error happened when jackson deserialization info!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result);
         }
     }
 
@@ -469,4 +417,47 @@ public class ClassRoomController {
             return ResponseEntity.ok(response);
         }
     }
+
+    @RequestMapping(path = "/downloadTemplateAddClassToRoomByFile", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Download template file template to import to add class to room by file")
+    @ApiResponses(value = {//
+            @ApiResponse(code = 204, message = "No data founded"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+    public ResponseEntity<Resource> getFile() {
+        String filename = "class_to_room.xlsx";
+        InputStreamResource file = new InputStreamResource(classRoomExcelService.load(classRoomExcelHelper));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .body(file);
+    }
+
+    @RequestMapping(value = "/uploadFileToAddClassToRoomByFile", method = RequestMethod.POST)
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Import file to add class to room by file")
+    @ApiResponses(value = {//
+            @ApiResponse(code = 204, message = "No data founded"), //
+            @ApiResponse(code = 400, message = "Invalidate data request"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+    public ResponseEntity<Resource> uploadFile(@RequestParam("file") MultipartFile file) {
+
+        if (AccountExcelHelper.hasExcelFormat(file)) {
+            try {
+                InputStreamResource fileResult = new InputStreamResource(classRoomExcelService.save(file));
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "class_room_import_result.xlsx")
+                        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                        .body(fileResult);
+            } catch (Exception e) {
+                throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        throw new CustomException("Please upload an excel file", HttpStatus.BAD_REQUEST);
+    }
+
 }

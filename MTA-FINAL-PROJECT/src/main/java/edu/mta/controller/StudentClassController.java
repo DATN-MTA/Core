@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mta.dto.StudentClassDTO;
 import edu.mta.exception.CustomException;
 import edu.mta.helper.AccountExcelHelper;
+import edu.mta.helper.StudentClassExcelHelper;
 import edu.mta.model.ReportError;
 import edu.mta.model.StudentClass;
 import edu.mta.service.AccountService;
@@ -60,6 +61,9 @@ public class StudentClassController {
 
     @Autowired
     private StudentClassExcelService studentClassExcelService;
+
+    @Autowired
+    private StudentClassExcelHelper studentClassExcelHelper;
 
     @Autowired
     public StudentClassController(@Qualifier("StudentClassServiceImpl1") StudentClassService studentClassService,
@@ -341,7 +345,7 @@ public class StudentClassController {
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Resource> getFile() {
         String filename = "student_to_class.xlsx";
-        InputStreamResource file = new InputStreamResource(studentClassExcelService.load());
+        InputStreamResource file = new InputStreamResource(studentClassExcelService.load(studentClassExcelHelper));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)

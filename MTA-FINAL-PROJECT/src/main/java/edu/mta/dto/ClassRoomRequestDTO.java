@@ -42,6 +42,9 @@ public class ClassRoomRequestDTO {
         this.roomID = roomID;
     }
 
+    public ClassRoomRequestDTO() {
+    }
+
     public Integer getId() {
         return id;
     }

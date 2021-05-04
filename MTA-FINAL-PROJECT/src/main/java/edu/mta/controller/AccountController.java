@@ -51,6 +51,7 @@ public class AccountController {
     private ValidationData validationData;
     private FrequentlyUtils frequentlyUtils;
 
+    @Autowired
     private AccountExcelHelper accountExcelHelper;
 
     @Autowired
@@ -294,7 +295,7 @@ public class AccountController {
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Resource> getFile() {
         String filename = "Account_Template.xlsx";
-        InputStreamResource file = new InputStreamResource(accountExcelService.load());
+        InputStreamResource file = new InputStreamResource(accountExcelService.load(accountExcelHelper));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
