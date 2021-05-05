@@ -1,11 +1,10 @@
 package edu.mta.helper;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import edu.mta.dto.TeacherClassDTO;
+import edu.mta.model.Class;
+import edu.mta.service.ClassService;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,25 +15,24 @@ import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class StudentClassExcelHelper extends ExcelHelperAbstract{
-    static String[] HEADERs = {"Email *"};
-
+public class TeacherClassExcelHelper extends ExcelHelperAbstract {
+    static String[] HEADERs = {"Email *", "Tên lớp"};
     @Override
     public String[] getHEADERs() {
         return HEADERs;
     }
 
     @Autowired
-    private ModelMapper modelMapper;
+    ClassService classService;
 
-    public List<String> excelToDTO(InputStream is) {
+    public List<TeacherClassDTO> excelToDTO(InputStream is) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
 
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
 
-            List<String> emailStudentList = new ArrayList<>();
+            List<TeacherClassDTO> teacherClassDTOList = new ArrayList<>();
             int rowNumber = 0;
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
@@ -46,7 +44,7 @@ public class StudentClassExcelHelper extends ExcelHelperAbstract{
                 }
 
                 Iterator<Cell> cellsInRow = currentRow.iterator();
-
+                TeacherClassDTO teacherClassDTO = new TeacherClassDTO();
 
                 int cellIdx = 0;
                 while (cellsInRow.hasNext()) {
@@ -55,7 +53,19 @@ public class StudentClassExcelHelper extends ExcelHelperAbstract{
 
                     switch (cellIdx) {
                         case 0:
-                            emailStudentList.add(currentCell.getStringCellValue());
+                            if (currentCell == null || currentCell.getCellType() == CellType.BLANK || currentCell.getCellType() != CellType.STRING) {
+                               teacherClassDTO.setTeacherEmail(null);
+                            } else {
+                                teacherClassDTO.setTeacherEmail(currentCell.getStringCellValue());
+                            }
+                            break;
+                        case 1:
+                            Class classIns = classService.findClassByClassName(currentCell.getStringCellValue());
+                            if (classIns != null) {
+                                teacherClassDTO.setClassID(classIns.getId());
+                            } else {
+                                teacherClassDTO.setClassID(0);
+                            }
                             break;
                         default:
                             break;
@@ -63,14 +73,13 @@ public class StudentClassExcelHelper extends ExcelHelperAbstract{
 
                     cellIdx++;
                 }
+                teacherClassDTOList.add(teacherClassDTO);
             }
 
             workbook.close();
-            return emailStudentList;
+            return teacherClassDTOList;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
         }
     }
-
-
 }

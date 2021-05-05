@@ -1,5 +1,9 @@
 package edu.mta.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.mta.common.CommonUtils;
+import edu.mta.dto.TeacherClassDTO;
 import edu.mta.enumData.IsLearning;
 import edu.mta.enumData.IsTeaching;
 import edu.mta.enumData.SpecialRollCall;
@@ -12,8 +16,11 @@ import edu.mta.repository.TeacherClassRepository;
 import edu.mta.utils.FrequentlyUtils;
 import edu.mta.utils.GeneralValue;
 import edu.mta.utils.ValidationAccountData;
+import edu.mta.utils.ValidationTeacherClassData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,10 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -46,6 +50,12 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 	public TeacherClassServiceImpl1() {
 		super();
 	}
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	@Autowired
+	private ValidationTeacherClassData validationTeacherClassData;
 
 	@Autowired
 	public TeacherClassServiceImpl1(@Qualifier("ClassRoomServiceImpl1") ClassRoomService classRoomService,
@@ -417,9 +427,55 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 	}
 
 	@Override
-	public void addNewTeacherClass(TeacherClass teacherClass) {
-		this.teacherClassRepository.save(teacherClass);
-		return;
+	public String addNewTeacherClass(TeacherClassDTO teacherClassDTO) {
+		try {
+			Map<String, Object> jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(teacherClassDTO), new TypeReference<Map<String, Object>>() {
+			});
+
+			// check request body has enough info in right JSON format
+			if (!this.frequentlyUtils.checkKeysExist(jsonMap, "teacherEmail", "classID")) {
+				 return  "You have to fill all required information!";
+			}
+
+			//teacherID = Integer.parseInt(jsonMap.get("teacherID").toString());
+			String teacherEmail = jsonMap.get("teacherEmail").toString();
+
+			int classID = Integer.parseInt(jsonMap.get("classID").toString());
+			String errorMessage = this.validationTeacherClassData.validateIdData(classID);
+			if (errorMessage != null) {
+				return "Adding teacher to class failed because ";
+			}
+
+			// check if the student and the class exist
+			Account teacherAccount = this.accountService.findAccountByEmail(teacherEmail);
+			if (teacherAccount == null || !teacherAccount.getRoles().contains(Role.ROLE_TEACHER)) {
+				return "Adding teacher to class failed because teacher email is invalid";
+			}
+			Class classInstance = this.classService.findClassByID(classID);
+			if (classInstance == null) {
+				return "Adding teacher to class failed because class is invalid";
+			}
+
+			TeacherClass teacherClass = this.findCurrentTeacherByClassID(classID);
+			if (teacherClass != null) {
+				if (teacherClass.getAccount().getEmail().equalsIgnoreCase(teacherEmail)) {
+					return "The teacher is teaching this class";
+				}
+				return "Another teacher is teaching this class!";
+			}
+
+			if (!this.checkTimetableConflict(teacherAccount.getId(), classID)) {
+				return "There are conflicts with current timetable";
+			}
+
+			teacherClass = new TeacherClass(classInstance, teacherAccount);
+			teacherClass.setIsTeaching(IsTeaching.TEACHING.getValue());
+			teacherClass.setListRollCall(null);
+			this.teacherClassRepository.save(teacherClass);
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
 	}
 
 	@Override
@@ -576,6 +632,15 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Page<TeacherClass> getTeacherClassByTeacherEmailOrClassName(String teacherEmail, String className, Pageable pageable) {
+		if (!CommonUtils.isNullOrEmpty(teacherEmail) || !CommonUtils.isNullOrEmpty(className)) {
+			return teacherClassRepository.getTeacherClassByAccount_EmailAndClassInstance_ClassName(teacherEmail, className, pageable);
+		} else {
+			return teacherClassRepository.findAll(pageable);
+		}
 	}
 
 }

@@ -99,7 +99,7 @@ public class ClassRoomController {
     public ResponseEntity<?> addNewClassRoom(@Valid @RequestBody ClassRoomRequestDTO classRoomRequestDTO) {
         ReportError report;
         String result = this.classRoomService.addNewClassRoom(classRoomRequestDTO);
-        if (result == null && result.isEmpty()) {
+        if (result == null) {
             report = new ReportError(200, "Adding new class-room suceeses!");
             return ResponseEntity.ok(report);
         } else {

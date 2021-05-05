@@ -1,13 +1,15 @@
 package edu.mta.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import edu.mta.model.Class;
 import edu.mta.model.TeacherClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TeacherClassRepository extends JpaRepository<TeacherClass, Integer>{
@@ -29,5 +31,7 @@ public interface TeacherClassRepository extends JpaRepository<TeacherClass, Inte
 
 	@Query("SELECT tc FROM TeacherClass tc WHERE tc.account.id = ?1 AND tc.isTeaching = ?2")
 	List<TeacherClass> findByCurrentTeacherID(int teacherID, int isLearning);
+
+	Page<TeacherClass> getTeacherClassByAccount_EmailAndClassInstance_ClassName(String teacherEmail, String className, Pageable pageable);
 
 }

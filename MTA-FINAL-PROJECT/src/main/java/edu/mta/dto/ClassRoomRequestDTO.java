@@ -12,11 +12,11 @@ public class ClassRoomRequestDTO {
     @Valid
     private Integer id;
 
-    @ApiModelProperty(position = 1, required = true, example = "06::00")
+    @ApiModelProperty(position = 1, required = true, example = "07:00:00")
     @Valid
     private String beginAt;
 
-    @ApiModelProperty(position = 2, required = true, example = "00:00:00")
+    @ApiModelProperty(position = 2, required = true, example = "10:50:00")
     @Valid
     @NotNull(message = "finishAt can't be NULL")
     private String finishAt;

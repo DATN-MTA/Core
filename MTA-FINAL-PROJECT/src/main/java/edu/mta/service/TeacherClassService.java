@@ -1,12 +1,15 @@
 package edu.mta.service;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
+import edu.mta.dto.TeacherClassDTO;
 import edu.mta.model.Account;
 import edu.mta.model.ClassRoom;
 import edu.mta.model.TeacherClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 public interface TeacherClassService {
 
@@ -55,7 +58,7 @@ public interface TeacherClassService {
 
 	boolean checkTimetableConflict(int teacherID, int classID);
 
-	void addNewTeacherClass(TeacherClass teacherClass);
+	String addNewTeacherClass(TeacherClassDTO teacherClassDTO);
 
 	String checkReasonValid(int reason);
 	
@@ -68,4 +71,7 @@ public interface TeacherClassService {
 	boolean checkTeacherIsTeaching(String teacherEmail, int classID);
 	
 	String checkTimetableConflict(Account account, int classID);
+
+	Page<TeacherClass> getTeacherClassByTeacherEmailOrClassName(String teacherEmail, String className, Pageable pageable);
+	
 }
