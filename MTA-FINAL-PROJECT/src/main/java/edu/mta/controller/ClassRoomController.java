@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalTime;
@@ -103,7 +102,7 @@ public class ClassRoomController {
             report = new ReportError(200, "Adding new class-room suceeses!");
             return ResponseEntity.ok(report);
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result);
+            throw new CustomException(result, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -265,7 +264,7 @@ public class ClassRoomController {
         } catch (Exception e) {
             e.printStackTrace();
             report = new ReportError(2, "Error happened when jackson deserialization info!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
+            throw new CustomException(report.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -368,7 +367,7 @@ public class ClassRoomController {
         } catch (Exception e) {
             e.printStackTrace();
             report = new ReportError(2, "Error happened when jackson deserialization info!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, report.toString());
+            throw new CustomException(report.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 

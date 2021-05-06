@@ -2,10 +2,7 @@ package edu.mta.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mta.dto.AccountDataDTO;
-import edu.mta.dto.ClassDTO;
-import edu.mta.dto.TeacherClassDTO;
-import edu.mta.dto.TeacherClassResponseDTO;
+import edu.mta.dto.*;
 import edu.mta.exception.CustomException;
 import edu.mta.helper.AccountExcelHelper;
 import edu.mta.helper.TeacherClassExcelHelper;
@@ -95,7 +92,12 @@ public class TeacherClassController {
     }
 
     @PostMapping(value = "/teacherRollCall")
-    public ResponseEntity<?> rollCall(@RequestBody String info) {
+    @PreAuthorize("hasRole('TEACHER')")
+    @ApiResponses(value = {//
+            @ApiResponse(code = 204, message = "No data founded"), //
+            @ApiResponse(code = 403, message = "Access denied"), //
+            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+    public ResponseEntity<?> rollCall(@RequestBody TeacherRollCallDTO teacherRollCallDTO) {
         int teacherID = 0;
         int classID = 0;
         int roomID = 0;
@@ -113,7 +115,7 @@ public class TeacherClassController {
 
         try {
             objectMapper = new ObjectMapper();
-            jsonMap = objectMapper.readValue(info, new TypeReference<Map<String, Object>>() {
+            jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(teacherRollCallDTO), new TypeReference<Map<String, Object>>() {
             });
 
             // check request body has enough info in right JSON format

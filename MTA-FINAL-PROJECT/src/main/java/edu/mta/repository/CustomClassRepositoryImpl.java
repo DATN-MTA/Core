@@ -1,10 +1,10 @@
 package edu.mta.repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 @Repository
 public class CustomClassRepositoryImpl implements CustomClassRepository {
@@ -18,9 +18,9 @@ public class CustomClassRepositoryImpl implements CustomClassRepository {
 	}
 
 	@Override
-	public void setNullIdentifyString(int id, String eventName, int classRoomID) {
+	public void setNullIdentifyString(int id, String eventName, int classRoomID, int minutes) {
 		String sql = " CREATE EVENT IF NOT EXISTS " + eventName
-				+ "   ON SCHEDULE AT NOW() + INTERVAL 10 MINUTE "
+				+ "   ON SCHEDULE AT NOW() + INTERVAL "+ minutes +" MINUTE "
 				+ "   DO "
 				+ "		BEGIN"
 				+ "   		UPDATE class "

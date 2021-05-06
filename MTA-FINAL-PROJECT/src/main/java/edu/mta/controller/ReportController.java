@@ -63,15 +63,10 @@ public class ReportController {
 
 	@RequestMapping(value = "/teacherGeneralReport", method = RequestMethod.POST)
 	@PreAuthorize("hasRoles('ROLE_ADMIN', 'ROLE_TEACHER')")
-	public ResponseEntity<?> getTeacherGeneralReport(@RequestParam(value = "adminID", required = true) int adminID,
-			@RequestBody String reportParams) {
+	public ResponseEntity<?> getTeacherGeneralReport(@RequestBody String reportParams) {
 		ReportOutput output = new ReportOutput();
-		String errorMessage = this.validationAccountData.validateIdData(adminID);
 		ReportError report = null;
-		if (errorMessage != null) {
-			report = new ReportError(110, "Get report failed because " + errorMessage);
-			return ResponseEntity.badRequest().body(report);
-		}
+		String errorMessage;
 
 		Map<String, Object> jsonMap = null;
 		ObjectMapper objectMapper = null;
@@ -87,14 +82,6 @@ public class ReportController {
 				report = new ReportError(1, "You have to fill all required information!");
 				return ResponseEntity.badRequest().body(report);
 			}
-
-			System.out.println("\n\nMile 1");
-			Account tmpAccount = this.accountService.findAccountByID(adminID);
-//			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
-//					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
-//				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
-//				return ResponseEntity.badRequest().body(report);
-//			}
 
 			System.out.println("\n\nMile 2");
 			String teacherEmail = jsonMap.get("email").toString();
@@ -213,14 +200,6 @@ public class ReportController {
 				report = new ReportError(1, "You have to fill all required information!");
 				return ResponseEntity.badRequest().body(report);
 			}
-
-			System.out.println("\n\nMile 1");
-			Account tmpAccount = this.accountService.findAccountByID(adminID);
-//			if (tmpAccount == null || (tmpAccount.getRole() != AccountRole.ADMIN.getValue()
-//					&& tmpAccount.getRole() != AccountRole.TEACHER.getValue())) {
-//				report = new ReportError(111, "Only admin and teacher has authority to use this API!");
-//				return ResponseEntity.badRequest().body(report);
-//			}
 
 			System.out.println("\n\nMile 2");
 			String studentEmail = jsonMap.get("email").toString();

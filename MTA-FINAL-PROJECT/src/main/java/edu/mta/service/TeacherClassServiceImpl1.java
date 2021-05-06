@@ -19,6 +19,7 @@ import edu.mta.utils.ValidationAccountData;
 import edu.mta.utils.ValidationTeacherClassData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,9 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Value("${qrcodeStringOutlive.minutes}")
+	private int minutes;
 
 	@Autowired
 	private ValidationTeacherClassData validationTeacherClassData;
@@ -191,7 +195,7 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 			// user Class.numberOfEvents to avoid conflict
 			Class.numberOfEvents += 1;
 			eventDynamicName = "generateIdentifyString" + Class.numberOfEvents;
-			this.classRepository.setNullIdentifyString(classID, eventDynamicName, classRoom.getId());
+			this.classRepository.setNullIdentifyString(classID, eventDynamicName, classRoom.getId(), minutes);
 
 			// this.classRepository.setIsCheckFalse(classID, timeString, eventDynamicName);
 			return identifyString;
@@ -448,8 +452,10 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 
 			// check if the student and the class exist
 			Account teacherAccount = this.accountService.findAccountByEmail(teacherEmail);
-			if (teacherAccount == null || !teacherAccount.getRoles().contains(Role.ROLE_TEACHER)) {
-				return "Adding teacher to class failed because teacher email is invalid";
+
+			List<ClassRoom> classRoom = this.classRoomRepository.findByClassID(classID);
+			if (classRoom == null || classRoom.isEmpty() || classRoom.size() == 0) {
+				return "Class is not assigned to room yet";
 			}
 			Class classInstance = this.classService.findClassByID(classID);
 			if (classInstance == null) {
