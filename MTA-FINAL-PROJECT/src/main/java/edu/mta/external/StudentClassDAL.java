@@ -13,9 +13,9 @@ import java.util.List;
 
 
 public class StudentClassDAL {
-	private static String url = "jdbc:mysql://localhost:3306/rollcall3?useUnicode=yes&characterEncoding=UTF-8";
+	private static String url = "jdbc:mysql://localhost:3306/roll_call?serverTimezone=Asia/Bangkok&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8";
 	private static String user = "root";
-	private static String password = "";
+	private static String password = "123456";
 
 	public static Connection getConnecṭ() {
 		Connection connection = null;
@@ -146,7 +146,7 @@ public class StudentClassDAL {
 		
 		try {
 			connection = getConnecṭ();
-			ps = connection.prepareStatement("SELECT ac.UserInfo, ac.Email, sc.listRollCall "
+			ps = connection.prepareStatement("SELECT ac., ac.Email, sc.listRollCall "
 					+ "FROM student_class AS sc, account AS ac "
 					+ "WHERE sc.IsLearning = ? AND ac.ID = sc.StudentID AND sc.ClassID = ?" );
 			ps.setInt(1, IsLearning.LEARNING.getValue());

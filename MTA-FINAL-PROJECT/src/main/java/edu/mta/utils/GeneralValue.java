@@ -56,7 +56,6 @@ public class GeneralValue {
     public static final String GEN_SYMBOLIC_FAIL_DES = "GEN SYMBOLIC FAIL";
     
     
-    public static final String LINK_FOLDER_REPORT_IN_SERVER = "C:\\Users\\BePro\\Desktop\\invoiceFolder";
-    public static final String LINK_FONT_REPORT_IN_SERVER = "C:\\Users\\BePro\\Desktop\\invoiceFolder\\font";
-    public static final String LINK_OUT_REPORT_IN_SERVER = "C:\\Users\\BePro\\Desktop\\invoiceFolder\\out";
+    public static final String LINK_FOLDER_REPORT_IN_SERVER = "D:\\linhxg\\DOAN\\Core\\template-report";
+    public static final String LINK_OUT_REPORT_IN_SERVER = "D:\\linhxg\\DOAN\\Core\\template-report\\out";
 }

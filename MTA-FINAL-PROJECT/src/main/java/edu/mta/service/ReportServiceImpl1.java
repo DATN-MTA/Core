@@ -8,6 +8,7 @@ import edu.mta.utils.GeneralValue;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -201,9 +202,9 @@ public class ReportServiceImpl1 {
 		}
 
 		System.out.println("\n\n list teacher-class = " + listTeacherClass);
-
-		LocalDate beginAt = LocalDate.parse(beginAtString);
-		LocalDate finishAt = LocalDate.parse(finishAtString);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		LocalDate beginAt = LocalDate.parse(beginAtString, formatter);
+		LocalDate finishAt = LocalDate.parse(finishAtString, formatter);
 		List<GeneralTeacherRecord> listRecord = new ArrayList<>();
 		GeneralTeacherRecord teacherRecord = null;
 		String listRollCall = null;

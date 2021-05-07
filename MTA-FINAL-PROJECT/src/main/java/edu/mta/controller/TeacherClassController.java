@@ -6,6 +6,7 @@ import edu.mta.dto.*;
 import edu.mta.exception.CustomException;
 import edu.mta.helper.AccountExcelHelper;
 import edu.mta.helper.TeacherClassExcelHelper;
+import edu.mta.model.Account;
 import edu.mta.model.ReportError;
 import edu.mta.model.TeacherClass;
 import edu.mta.service.*;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -97,8 +99,7 @@ public class TeacherClassController {
             @ApiResponse(code = 204, message = "No data founded"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public ResponseEntity<?> rollCall(@RequestBody TeacherRollCallDTO teacherRollCallDTO) {
-        int teacherID = 0;
+    public ResponseEntity<?> rollCall(@RequestBody TeacherRollCallDTO teacherRollCallDTO, HttpServletRequest request) {
         int classID = 0;
         int roomID = 0;
         int weekday = 0;
@@ -118,19 +119,13 @@ public class TeacherClassController {
             jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(teacherRollCallDTO), new TypeReference<Map<String, Object>>() {
             });
 
-            // check request body has enough info in right JSON format
-//			if (!this.jsonMapUtil.checkKeysExist(jsonMap, "teacherID", "classID", "roomID", "gpsLong", "gpsLa")) {
-//				report = new ReportError(1, "You have to fill all required information!");
-//				return ResponseEntity.badRequest().body(report);
-//			}
+            Account account = accountService.whoami(request);
 
-            if (!this.frequentlyUtils.checkKeysExist(jsonMap, "teacherID", "classID", "roomID")) {
+            if (!this.frequentlyUtils.checkKeysExist(jsonMap, "classID", "roomID")) {
                 report = new ReportError(1, "You have to fill all required information!");
                 return ResponseEntity.badRequest().body(report);
             }
 
-            teacherID = Integer.parseInt(jsonMap.get("teacherID").toString());
-            errorMessage = this.validationTeacherClassData.validateIdData(teacherID);
             if (errorMessage != null) {
                 report = new ReportError(80, "Teacher roll call failed because " + errorMessage);
                 return ResponseEntity.badRequest().body(report);
@@ -150,24 +145,11 @@ public class TeacherClassController {
                 return ResponseEntity.badRequest().body(report);
             }
 
-//			gpsLong = Double.parseDouble(jsonMap.get("gpsLong").toString());
-//			gpsLa = Double.parseDouble(jsonMap.get("gpsLa").toString());
-//			if (gpsLong < -180 || gpsLong > 180 || gpsLa < -90 || gpsLa > 90) {
-//				report = new ReportError(84, "Longitude/Latitude is out of practical range!");
-//				return ResponseEntity.badRequest().body(report);
-//			}
-
             // check teacher has authority to roll call this class
-            if (!this.teacherClassService.checkTeacherHasAuthority(teacherID, classID)) {
+            if (!this.teacherClassService.checkTeacherHasAuthority(account.getId(), classID)) {
                 report = new ReportError(11, "Authentication has failed or has not yet been provided!");
                 return new ResponseEntity<>(report, HttpStatus.UNAUTHORIZED);
             }
-
-            // check if device is in distance limit - 50m
-//			if (this.roomService.calculateDistanceBetween2GPSCoord(roomID, gpsLong, gpsLa) > 50) {
-//				report = new ReportError(85, "Device is out of valid distance to classroom!");
-//				return ResponseEntity.badRequest().body(report);
-//			}
 
             // Check teacher generate time in valid limit
             // Notice: weekday of java = weekday of mySQL - 1
@@ -188,7 +170,7 @@ public class TeacherClassController {
 
             // add generate time and date to teacher's listRollCall
             rollCallAt = LocalDateTime.now();
-            this.teacherClassService.rollCall(rollCallAt, teacherID, classID);
+            this.teacherClassService.rollCall(rollCallAt, account.getId(), classID);
 
             report = new ReportError(200, result);
             return ResponseEntity.ok(report);

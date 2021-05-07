@@ -1,36 +1,31 @@
 package edu.mta.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import edu.mta.enumData.AccountRole;
-import edu.mta.model.ClassRoom;
-import edu.mta.model.ReportError;
-import edu.mta.model.StudentClass;
-import edu.mta.model.TeacherClass;
-import edu.mta.service.ClassRoomService;
-import edu.mta.service.SemesterService;
+import edu.mta.enumData.CheckRollcallStatus;
+import edu.mta.exception.CustomException;
+import edu.mta.model.*;
+import edu.mta.service.*;
 import edu.mta.utils.GeneralValue;
+import edu.mta.utils.ValidationAccountData;
+import edu.mta.utils.ValidationSemesterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.mta.enumData.CheckRollcallStatus;
-import edu.mta.service.StudentClassService;
-import edu.mta.service.TeacherClassService;
-import edu.mta.utils.ValidationAccountData;
-import edu.mta.utils.ValidationSemesterData;
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UncategorizedController {
@@ -48,6 +43,9 @@ public class UncategorizedController {
 	}
 
 	@Autowired
+	private AccountService accountService;
+
+	@Autowired
 	public UncategorizedController(@Qualifier("StudentClassServiceImpl1") StudentClassService studentClassService,
 			@Qualifier("TeacherClassServiceImpl1") TeacherClassService teacherClassService,
 			@Qualifier("SemesterServiceImpl1") SemesterService semesterService,
@@ -63,57 +61,50 @@ public class UncategorizedController {
 		this.classRoomService = classRoomService;
 	}
 
-	@GetMapping("/timetable")
-	public ResponseEntity<?> getTimeTable(@RequestParam(value = "role", required = true) int role,
-			@RequestParam(value = "accountID", required = true) int accountID,
-			@RequestParam(value = "semesterID", required = true) int semesterID) {
+	@GetMapping("/getTimeTable")
+	@PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_TEACHER')")
+	public ResponseEntity<?> getTimeTable(@RequestParam(value = "semesterID", required = false) Integer semesterID, HttpServletRequest req) {
+		try {
 
-		ReportError report = null;
-		String errorMessage = null;
+			ReportError report = null;
+			String errorMessage = null;
 
-		errorMessage = this.validationAccountData.validateIdData(accountID);
-		if (errorMessage != null) {
-			report = new ReportError(100, "Getting timetable failed because " + errorMessage);
-			return ResponseEntity.badRequest().body(report);
-		}
+			Account account = this.accountService.whoami(req);
 
-		errorMessage = this.validationAccountData.validateRoleData(role);
-		if (errorMessage != null) {
-			report = new ReportError(100, "Getting timetable failed because " + errorMessage);
-			return ResponseEntity.badRequest().body(report);
-		}
+			// truong hop vua login xong thi lay server time de tim semester hien tai
+			if (semesterID == null) {
+				LocalDate currentDate = LocalDate.now();
+				semesterID = this.semesterService.getSemesterIDByDate(currentDate);
+				if (semesterID == -1) {
+					report = new ReportError(33, "This semester do not exist yet!");
+					return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
+				}
 
-		// truong hop vua login xong thi lay server time de tim semester hien tai
-		if (semesterID == 0) {
-			LocalDate currentDate = LocalDate.now();
-			semesterID = this.semesterService.getSemesterIDByDate(currentDate);
-			if (semesterID == -1) {
-				report = new ReportError(33, "This semester do not exist yet!");
-				return new ResponseEntity<>(report, HttpStatus.NOT_FOUND);
+			} else {
+				errorMessage = this.validationSemesterData.validateIdData(semesterID);
+				if (errorMessage != null) {
+					report = new ReportError(100, "Getting timetable failed because " + errorMessage);
+					return ResponseEntity.badRequest().body(report);
+				}
 			}
 
-		} else {
-			errorMessage = this.validationSemesterData.validateIdData(semesterID);
-			if (errorMessage != null) {
-				report = new ReportError(100, "Getting timetable failed because " + errorMessage);
-				return ResponseEntity.badRequest().body(report);
+			List<ClassRoom> listClassRoom = null;
+			if (account.getRoles().equals(Role.ROLE_STUDENT)) {
+				listClassRoom = this.studentClassService.getTimeTable(account.getId(), semesterID);
+
+			} else {
+				listClassRoom = this.teacherClassService.getTimeTable(account.getId(), semesterID);
 			}
-		}
 
-		List<ClassRoom> listClassRoom = null;
-		if (role == AccountRole.STUDENT.getValue()) {
-			listClassRoom = this.studentClassService.getTimeTable(accountID, semesterID);
+			if (listClassRoom == null) {
+				listClassRoom = new ArrayList<>();
+				return ResponseEntity.ok(listClassRoom);
+			}
 
-		} else if (role == AccountRole.TEACHER.getValue()) {
-			listClassRoom = this.teacherClassService.getTimeTable(accountID, semesterID);
-		}
-
-		if (listClassRoom == null) {
-			listClassRoom = new ArrayList<>();
 			return ResponseEntity.ok(listClassRoom);
+		} catch (Exception ex) {
+			throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		return ResponseEntity.ok(listClassRoom);
 	}
 
 	@PostMapping("/checkTeacherRollCallToday")
