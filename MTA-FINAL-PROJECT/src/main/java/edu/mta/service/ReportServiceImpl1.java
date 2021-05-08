@@ -349,9 +349,10 @@ public class ReportServiceImpl1 {
 		}
 
 		System.out.println("\n\n list studentClass = " + listStudentClass);
-		
-		LocalDate beginAt = LocalDate.parse(beginAtString);
-		LocalDate finishAt = LocalDate.parse(finishAtString);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		LocalDate beginAt = LocalDate.parse(beginAtString, formatter);
+		LocalDate finishAt = LocalDate.parse(finishAtString, formatter);
 		int beginYear = beginAt.getYear();
 		int beginDayOfYear = beginAt.getDayOfYear();
 		int finishYear = finishAt.getYear();
@@ -375,7 +376,7 @@ public class ReportServiceImpl1 {
 			
 			if (listRollCallRaw == null || listRollCallRaw.isEmpty()) {
 				record = new DetailRecordForClass();
-				//need_change studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0]
+				studentName = studentClass.getAccount().getUser().getFullName();
 				record.setStudentName(studentName);
 				record.setSumOfMissingRollCall(0);
 				record.setSumOfRollCall(0);
@@ -456,8 +457,7 @@ public class ReportServiceImpl1 {
 					
 			}
 
-			//need_changeSystem.out.println("\n\n user info = " + studentClass.getAccount().getUserInfo());
-			//need_change studentName = studentClass.getAccount().getUserInfo().split(GeneralValue.regexForSplitUserInfo)[0];
+			studentName = studentClass.getAccount().getUser().getFullName();
 			System.out.println("\n\n studentName = " + studentName);
 			
 			record = new DetailRecordForClass();

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -108,7 +109,19 @@ public class UncategorizedController {
 	}
 
 	@PostMapping("/checkTeacherRollCallToday")
-	@Scheduled(cron = "0 1 20 * * ?")
+	@Schedules({
+			@Scheduled(cron = "0 45 7 * * ?"),
+			@Scheduled(cron = "0 35 8 * * ?"),
+			@Scheduled(cron = "0 25 9 * * ?"),
+			@Scheduled(cron = "0 20 10 * * ?"),
+			@Scheduled(cron = "0 10 11 * * ?"),
+			@Scheduled(cron = "0 55 11 * * ?"),
+			@Scheduled(cron = "0 15 13 * * ?"),
+			@Scheduled(cron = "0 5 14 * * ?"),
+			@Scheduled(cron = "0 10 15 * * ?"),
+			@Scheduled(cron = "0 50 16 * * ?"),
+			@Scheduled(cron = "0 40 17 * * ?")
+	})
 	public ResponseEntity<?> checkTeacherRollCallToday() {
 
 		ReportError report = null;
@@ -240,7 +253,19 @@ public class UncategorizedController {
 
 	@SuppressWarnings("deprecation")
 	@PostMapping("/checkStudentRollCallToday")
-	@Scheduled(cron = "0 1 20 * * ?")
+	@Schedules({
+			@Scheduled(cron = "0 45 7 * * ?"),
+			@Scheduled(cron = "0 35 8 * * ?"),
+			@Scheduled(cron = "0 25 9 * * ?"),
+			@Scheduled(cron = "0 20 10 * * ?"),
+			@Scheduled(cron = "0 10 11 * * ?"),
+			@Scheduled(cron = "0 55 11 * * ?"),
+			@Scheduled(cron = "0 15 13 * * ?"),
+			@Scheduled(cron = "0 5 14 * * ?"),
+			@Scheduled(cron = "0 20 15 * * ?"),
+			@Scheduled(cron = "0 50 16 * * ?"),
+			@Scheduled(cron = "0 40 17 * * ?")
+	})
 	public ResponseEntity<?> checkStudentRollCallToday() {
 
 		ReportError report = null;

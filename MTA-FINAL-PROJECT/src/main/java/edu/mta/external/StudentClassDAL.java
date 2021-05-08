@@ -1,12 +1,10 @@
 package edu.mta.external;
 
 import edu.mta.enumData.IsLearning;
-import edu.mta.model.Account;
-import edu.mta.model.Course;
-import edu.mta.model.StudentClass;
-import edu.mta.model.TeacherClass;
+import edu.mta.model.*;
 
 import java.io.IOException;
+import java.lang.Class;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +144,7 @@ public class StudentClassDAL {
 		
 		try {
 			connection = getConnecṭ();
-			ps = connection.prepareStatement("SELECT ac., ac.Email, sc.listRollCall "
+			ps = connection.prepareStatement("SELECT ac.ID, ac.Email, sc.listRollCall "
 					+ "FROM student_class AS sc, account AS ac "
 					+ "WHERE sc.IsLearning = ? AND ac.ID = sc.StudentID AND sc.ClassID = ?" );
 			ps.setInt(1, IsLearning.LEARNING.getValue());
@@ -157,7 +155,7 @@ public class StudentClassDAL {
 				studentClass = new StudentClass();
 				tmpAccount = new Account();
 
-				//need_change tmpAccount.setUserInfo(rs.getString("UserInfo"));
+				tmpAccount.setUser(getUserInfo(rs.getString("ID")));
 				tmpAccount.setEmail(rs.getString("Email"));
 				studentClass.setAccount(tmpAccount);
 				studentClass.setListRollCall(rs.getString("listRollCall"));
@@ -166,6 +164,41 @@ public class StudentClassDAL {
 			}
 			
 			return listOfStudent;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public User getUserInfo(String accountId) {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		List<TeacherClass> listOfClass = new ArrayList<>();
+		ResultSet rs = null;
+
+		try {
+			connection = getConnecṭ();
+			ps = connection.prepareStatement("SELECT u.id, u.address, u.fullname FROM user as u WHERE account_id = ?" );
+			ps.setString(1, accountId);
+			rs = ps.executeQuery();
+			User user = new User();
+			while (rs.next()) {
+				user.setId(rs.getInt("id"));
+				user.setAddress(rs.getString("address"));
+				user.setFullName(rs.getString("fullname"));
+			}
+			return user;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
