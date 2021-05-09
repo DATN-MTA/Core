@@ -642,9 +642,13 @@ public class TeacherClassServiceImpl1 implements TeacherClassService {
 
 	@Override
 	public Page<TeacherClass> getTeacherClassByTeacherEmailOrClassName(String teacherEmail, String className, Pageable pageable) {
-		if (!CommonUtils.isNullOrEmpty(teacherEmail) || !CommonUtils.isNullOrEmpty(className)) {
+		if (!CommonUtils.isNullOrEmpty(teacherEmail) && !CommonUtils.isNullOrEmpty(className)) {
 			return teacherClassRepository.getTeacherClassByAccount_EmailAndClassInstance_ClassName(teacherEmail, className, pageable);
-		} else {
+		} else if (!CommonUtils.isNullOrEmpty(teacherEmail)) {
+			return teacherClassRepository.getTeacherClassByAccount_Email(teacherEmail, pageable);
+		} else if (!CommonUtils.isNullOrEmpty(className)) {
+			return teacherClassRepository.getTeacherClassByClassInstance_ClassName(className, pageable);
+		}else {
 			return teacherClassRepository.findAll(pageable);
 		}
 	}

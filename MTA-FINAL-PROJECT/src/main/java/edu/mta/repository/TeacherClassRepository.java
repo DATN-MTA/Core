@@ -34,4 +34,8 @@ public interface TeacherClassRepository extends JpaRepository<TeacherClass, Inte
 
 	Page<TeacherClass> getTeacherClassByAccount_EmailAndClassInstance_ClassName(String teacherEmail, String className, Pageable pageable);
 
+	Page<TeacherClass> getTeacherClassByAccount_Email(String teacherEmail, Pageable pageable);
+
+	Page<TeacherClass> getTeacherClassByClassInstance_ClassName(String className, Pageable pageable);
+
 }

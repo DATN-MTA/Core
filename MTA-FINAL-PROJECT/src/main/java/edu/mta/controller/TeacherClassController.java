@@ -344,6 +344,7 @@ public class TeacherClassController {
             teacherClassResponseDTO.setId(teacherClass.getId());
             teacherClassResponseDTO.setTeacherEmail(teacherClass.getAccount().getEmail());
             teacherClassResponseDTO.setClassName(teacherClass.getClassInstance().getClassName());
+            teacherClassResponseDTO.setClassID(teacherClass.getClassInstance().getId());
             teacherClassResponseDTO.setClassDTO(modelMapper.map(teacherClass.getClassInstance(), ClassDTO.class));
             teacherClassResponseDTO.setAccountDataDTO(modelMapper.map(teacherClass.getAccount(), AccountDataDTO.class));
             teacherClassResponseDTO.setIsTeaching(teacherClass.getIsTeaching());
